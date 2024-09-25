@@ -6,6 +6,7 @@ namespace Lucite\ApiSpec\Tests;
 
 use Lucite\ApiSpec\Method;
 use Lucite\ApiSpec\QueryParameter;
+use Lucite\ApiSpec\Schema;
 use PHPUnit\Framework\TestCase;
 
 class FinalizeMethodTest extends TestCase
@@ -26,12 +27,13 @@ class FinalizeMethodTest extends TestCase
 
     public function testFinalizeMethodWithSchema(): void
     {
-        $obj = Method::create('get', 'a get request', 'getResource', 'TestSchema');
+        $schema = Schema::create('Test');
+        $obj = Method::create('post', 'a get request', 'getResource', $schema);
         $finalized = $obj->finalize();
 
         $schema = $finalized['requestBody']['content']['application/json']['schema'];
         $this->assertEquals(
-            '#/components/schemas/TestSchema',
+            '#/components/schemas/Test',
             $schema['properties']['data']['$ref'],
         );
         $this->assertTrue($finalized['requestBody']['required']);
@@ -39,7 +41,8 @@ class FinalizeMethodTest extends TestCase
 
     public function testFinalizeMethodWithQueryParameter(): void
     {
-        $obj = Method::create('get', 'a get request', 'getResource', 'TestSchema');
+        $schema = Schema::create('Test');
+        $obj = Method::create('get', 'a get request', 'getResource', $schema);
         $obj
             ->addParameter(QueryParameter::create('param1', 'firstParameter', false, 'string'))
             ->addParameter(QueryParameter::create('param2', 'secondParameter', false, 'string'));

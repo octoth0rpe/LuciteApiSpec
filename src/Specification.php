@@ -75,7 +75,7 @@ class Specification implements SpecNodeInterface
             $this->addPath(Path::create($url));
         }
         $this->paths[$url]->addMethod(
-            Method::create('get', 'Fetch a collection of '.$schema->name.' resources', 'get'.$pluralSchema->name)
+            Method::create('get', 'Fetch a collection of '.$schema->name.' resources', 'get'.$pluralSchema->name, $schema)
                 ->addResponse(Response::create('200', '', $pluralSchema->name))
         );
 
@@ -84,7 +84,7 @@ class Specification implements SpecNodeInterface
             $this->addPath(Path::create($getOneUrl));
         }
         $this->paths[$getOneUrl]->addMethod(
-            Method::create('get', 'Fetch a single '.$schema->name.' resource', 'get'.$schema->name)
+            Method::create('get', 'Fetch a single '.$schema->name.' resource', 'get'.$schema->name, $schema)
                 ->addParameter(PathParameter::create($primaryKey->name, 'The '.$primaryKey->name.' of the resource to fetch', true, 'integer'))
                 ->addResponse(Response::create('200', '', $schema->name))
                 ->addResponse(Response::create('404', 'Not Found'))
@@ -107,7 +107,7 @@ class Specification implements SpecNodeInterface
         }
 
         $this->paths[$url]->addMethod(
-            Method::create('post', 'Create a new '.$schema->name.' resource', 'create'.$schema->name, $createSchema->name)
+            Method::create('post', 'Create a new '.$schema->name.' resource', 'create'.$schema->name, $schema)
                 ->addResponse(Response::create('201', 'Successfully created', $schema->name))
                 ->addResponse(Response::create('401', 'Not Authorized'))
                 ->addResponse(Response::create('422', 'Validation Error'))
@@ -125,7 +125,7 @@ class Specification implements SpecNodeInterface
         }
 
         $this->paths[$url]->addMethod(
-            Method::create('patch', 'Update an existing '.$schema->name.' resource', 'update'.$schema->name, $schema->name)
+            Method::create('patch', 'Update an existing '.$schema->name.' resource', 'update'.$schema->name, $schema)
                 ->addParameter(PathParameter::create($primaryKey->name, 'The '.$primaryKey->name.' of the resource to fetch', true, 'integer'))
                 ->addResponse(Response::create('201', 'Successfully updated', $schema->name))
                 ->addResponse(Response::create('401', 'Not Authorized'))
@@ -145,7 +145,7 @@ class Specification implements SpecNodeInterface
             $this->addPath(Path::create($url));
         }
         $this->paths[$url]->addMethod(
-            Method::create('delete', 'Delete a '.$schema->name.' resource', 'delete'.$schema->name)
+            Method::create('delete', 'Delete a '.$schema->name.' resource', 'delete'.$schema->name, $schema)
                 ->addParameter(PathParameter::create($primaryKey->name, 'The '.$primaryKey->name.' of the resource to delete', true, 'integer'))
                 ->addResponse(Response::create('204', 'Deleted'))
                 ->addResponse(Response::create('401', 'Not Authorized'))
@@ -176,7 +176,24 @@ class Specification implements SpecNodeInterface
     {
         foreach ($this->paths as $path) {
             foreach ($path->methods as $method) {
-                yield $method->method => [$path->path, $method->operationId];
+                $function = '';
+                switch ($method->method) {
+                    case 'get':
+                        $function = ($method->operationId === 'get'.$method->schema->name)
+                            ? 'getOne'
+                            : 'getMany';
+                        break;
+                    case 'post':
+                        $function = 'create';
+                        break;
+                    case 'patch':
+                        $function = 'update';
+                        break;
+                    case 'delete':
+                        $function = 'delete';
+                        break;
+                }
+                yield $method->method => [$path->path, $method->schema->name, $function];
             }
         }
     }

@@ -33,6 +33,10 @@ class Response implements SpecNodeInterface
                     'schema' => [
                         'type' => 'object',
                         'properties' => [
+                            'success' => [
+                                'type' => 'boolean',
+                                'const' => false,
+                            ],
                             'warnings' => [
                                 'type' => 'object',
                                 'additionalProperties' => [
@@ -58,6 +62,10 @@ class Response implements SpecNodeInterface
                         'schema' => [
                             'type' => 'object',
                             'properties' => [
+                                'success' => [
+                                    'type' => 'boolean',
+                                    'const' => true,
+                                ],
                                 'warnings' => [
                                     'type' => 'object',
                                     'additionalProperties' => [

@@ -9,11 +9,11 @@ class Method implements SpecNodeInterface
     public string $method;
     public string $summary;
     public string $operationId;
-    public ?string $schema;
+    public ?Schema $schema;
     public array $responses = [];
     public array $parameters = [];
 
-    public function __construct(string $method, string $summary, string $operationId, ?string $schema = null)
+    public function __construct(string $method, string $summary, string $operationId, ?Schema $schema = null)
     {
         $this->method = $method;
         $this->summary = $summary;
@@ -27,7 +27,7 @@ class Method implements SpecNodeInterface
             'summary' => $this->summary,
             'operationId' => $this->operationId,
         ];
-        if ($this->schema !== null) {
+        if ($this->schema !== null && in_array($this->method, ['post', 'patch'])) {
             $finalized["requestBody"] = [
                 'content' => [
                     'application/json' => [
@@ -35,7 +35,7 @@ class Method implements SpecNodeInterface
                             'type' => 'object',
                             'properties' => [
                                 'data' => [
-                                    '$ref' => '#/components/schemas/'.$this->schema,
+                                    '$ref' => '#/components/schemas/'.$this->schema->name,
                                 ],
                             ],
                         ],
@@ -70,7 +70,7 @@ class Method implements SpecNodeInterface
         return $this;
     }
 
-    public static function create(string $method, string $summary, string $operationId, ?string $schema = null): Method
+    public static function create(string $method, string $summary, string $operationId, ?Schema $schema = null): Method
     {
         return new Method($method, $summary, $operationId, $schema);
     }

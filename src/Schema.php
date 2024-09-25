@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lucite\ApiSpec;
 
+use Lucite\Apispec\Validator;
+
 class Schema implements SpecNodeInterface
 {
     public string $name;
@@ -28,6 +30,14 @@ class Schema implements SpecNodeInterface
     {
         # TODO: necessary to compare properties?
         return $this->name === $baseSchema->name.'Create';
+    }
+
+    public function getValidator(): Validator
+    {
+        if (count($this->properties) === 0) {
+            throw new \Exception('Schema does not have any properties defined');
+        }
+        return new Validator(array_slice($this->properties, 1));
     }
 
     public function addProperty(Property $newProperty): Schema
