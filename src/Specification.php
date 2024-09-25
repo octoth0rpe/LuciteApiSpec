@@ -1,0 +1,219 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Lucite\ApiSpec;
+
+use Lucite\Schema\Exception\SchemaNotFoundException;
+
+class Specification implements SpecNodeInterface
+{
+    public static string $openApiVersion = '3.1.0';
+    public string $title = '';
+    public string $version = '';
+    public ?string $description = null;
+
+    protected array $paths = [];
+    protected array $schemas = [];
+
+    public function __construct(string $title, string $version, ?string $description = null)
+    {
+        $this->title = $title;
+        $this->version = $version;
+        $this->description = $description;
+    }
+
+    public function addSchema(Schema $newSchema, bool $addPlural = true, bool $addCreateVariant = true): Specification
+    {
+        $this->schemas[$newSchema->name] = $newSchema;
+
+        if ($addPlural) {
+            $plural = $newSchema->name.'List';
+            $this->schemas[$plural] = new ArraySchema($plural, $newSchema->name);
+        }
+
+        if ($addCreateVariant) {
+            $createSchema = clone $newSchema;
+            $createSchema->name = $createSchema->name.'Create';
+            array_shift($createSchema->properties);
+            $this->schemas[$createSchema->name] = $createSchema;
+        }
+
+        return $this;
+    }
+
+    public function addErrorSchema(): Specification
+    {
+        return $this;
+    }
+
+    public function addPath(Path $newPath): Specification
+    {
+        $this->paths[$newPath->path] = $newPath;
+        return $this;
+    }
+
+    public function getSchema(string $name): Schema
+    {
+        if (isset($this->schemas[$name])) {
+            return $this->schemas[$name];
+        }
+        throw new SchemaNotFoundException();
+    }
+
+    public function addRestGet(string $url, Schema $schema): Specification
+    {
+        $pluralSchema = null;
+        foreach ($this->schemas as $possiblePluralSchema) {
+            if ($possiblePluralSchema->usesBaseSchema($schema)) {
+                $pluralSchema = $possiblePluralSchema;
+            }
+        }
+        $primaryKey = $schema->primaryKey();
+
+        if (isset($this->paths[$url]) === false) {
+            $this->addPath(Path::create($url));
+        }
+        $this->paths[$url]->addMethod(
+            Method::create('get', 'Fetch a collection of '.$schema->name.' resources', 'get'.$pluralSchema->name)
+                ->addResponse(Response::create('200', '', $pluralSchema->name))
+        );
+
+        $getOneUrl = $url.'{'.$primaryKey->name.'}';
+        if (isset($this->paths[$getOneUrl]) === false) {
+            $this->addPath(Path::create($getOneUrl));
+        }
+        $this->paths[$getOneUrl]->addMethod(
+            Method::create('get', 'Fetch a single '.$schema->name.' resource', 'get'.$schema->name)
+                ->addParameter(PathParameter::create($primaryKey->name, 'The '.$primaryKey->name.' of the resource to fetch', true, 'integer'))
+                ->addResponse(Response::create('200', '', $schema->name))
+                ->addResponse(Response::create('404', 'Not Found'))
+        );
+
+        return $this;
+    }
+
+    public function addRestPost(string $url, Schema $schema): Specification
+    {
+        $createSchema = null;
+        foreach ($this->schemas as $possibleCreateSchema) {
+            if ($possibleCreateSchema->isCreateSchemaFor($schema)) {
+                $createSchema = $possibleCreateSchema;
+            }
+        }
+
+        if (isset($this->paths[$url]) === false) {
+            $this->addPath(Path::create($url));
+        }
+
+        $this->paths[$url]->addMethod(
+            Method::create('post', 'Create a new '.$schema->name.' resource', 'create'.$schema->name, $createSchema->name)
+                ->addResponse(Response::create('201', 'Successfully created', $schema->name))
+                ->addResponse(Response::create('401', 'Not Authorized'))
+                ->addResponse(Response::create('422', 'Validation Error'))
+        );
+
+        return $this;
+    }
+
+    public function addRestPatch(string $url, Schema $schema): Specification
+    {
+        $primaryKey = $schema->primaryKey();
+        $url .= '{'.$primaryKey->name.'}';
+        if (isset($this->paths[$url]) === false) {
+            $this->addPath(Path::create($url));
+        }
+
+        $this->paths[$url]->addMethod(
+            Method::create('patch', 'Update an existing '.$schema->name.' resource', 'update'.$schema->name, $schema->name)
+                ->addParameter(PathParameter::create($primaryKey->name, 'The '.$primaryKey->name.' of the resource to fetch', true, 'integer'))
+                ->addResponse(Response::create('201', 'Successfully updated', $schema->name))
+                ->addResponse(Response::create('401', 'Not Authorized'))
+                ->addResponse(Response::create('404', 'Not Found'))
+                ->addResponse(Response::create('422', 'Validation Error'))
+        );
+
+        return $this;
+    }
+
+    public function addRestDelete(string $url, Schema $schema): Specification
+    {
+        $primaryKey = $schema->primaryKey();
+        $url = $url.'{'.$primaryKey->name.'}';
+
+        if (isset($this->paths[$url]) === false) {
+            $this->addPath(Path::create($url));
+        }
+        $this->paths[$url]->addMethod(
+            Method::create('delete', 'Delete a '.$schema->name.' resource', 'delete'.$schema->name)
+                ->addParameter(PathParameter::create($primaryKey->name, 'The '.$primaryKey->name.' of the resource to delete', true, 'integer'))
+                ->addResponse(Response::create('204', 'Deleted'))
+                ->addResponse(Response::create('401', 'Not Authorized'))
+                ->addResponse(Response::create('404', 'Not Found'))
+        );
+        return $this;
+    }
+
+    public function addRestMethods(string $baseUrl, Schema $schema, bool $get = true, bool $post = true, bool $patch = true, bool $delete = true): Specification
+    {
+        $this->addSchema($schema);
+        if ($get) {
+            $this->addRestGet($baseUrl, $schema);
+        }
+        if ($post) {
+            $this->addRestPost($baseUrl, $schema);
+        }
+        if ($patch) {
+            $this->addRestPatch($baseUrl, $schema);
+        }
+        if ($delete) {
+            $this->addRestDelete($baseUrl, $schema);
+        }
+        return $this;
+    }
+
+    public function generateRoutes()
+    {
+        foreach ($this->paths as $path) {
+            foreach ($path->methods as $method) {
+                yield $method->method => [$path->path, $method->operationId];
+            }
+        }
+    }
+
+    /**
+     * Creates final openapi specification structure as an array suitable for
+     * passing to json_encode.
+     * @return array
+     */
+    public function finalize(): array
+    {
+        $obj = [
+            'openapi' => static::$openApiVersion,
+            'info' => [
+                'title' => $this->title,
+                'version' => $this->version,
+            ],
+        ];
+
+        if (is_null($this->description) === false) {
+            $obj['info']['description'] = $this->description;
+        }
+
+        if (count($this->paths) > 0) {
+            $obj['paths'] = [];
+        }
+        foreach ($this->paths as $name => $path) {
+            $obj['paths'][$name] = $path->finalize();
+        }
+
+        if (count($this->schemas) > 0) {
+            $obj['components'] = ['schemas' => []];
+        }
+        foreach ($this->schemas as $name => $schema) {
+            $obj['components']['schemas'][$name] = $schema->finalize();
+        }
+
+        return $obj;
+    }
+}
