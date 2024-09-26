@@ -15,8 +15,8 @@ class FinalizeRestSpecificationTest extends TestCase
     {
         $bookSchema = Schema::create('Book')
             ->addProperty(Property::create('bookId', ['type' => 'integer']))
-            ->addProperty(Property::create('title'))
-            ->addProperty(Property::create('description'));
+            ->addProperty(Property::create('title', ['minLength' => 1, 'maxLength' => 255]))
+            ->addProperty(Property::create('description', ['minLength' => 0, 'maxLength' => 8000]));
         $authorSchema = Schema::create('Author')
             ->addProperty(Property::create('authorId', ['type' => 'integer']))
             ->addProperty(Property::create('bookId', ['type' => 'integer']))
@@ -37,9 +37,9 @@ class FinalizeRestSpecificationTest extends TestCase
             $routes[] = strtoupper($method).' '.$path." -> $schemaName:$function";
         }
         sort($routes);
-        echo("\n--------\n");
-        echo(json_encode($obj->finalize()));
-        echo("\n--------\n");
+        #echo("\n--------\n");
+        #echo(json_encode($obj->finalize()));
+        #echo("\n--------\n");
 
 
         $this->assertEquals('DELETE /authors/{authorId} -> Author:delete', $routes[0]);
