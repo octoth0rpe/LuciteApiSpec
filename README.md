@@ -11,7 +11,7 @@ For example, you can create a string property named `title` with a minimum lengt
 
 You could then add that to a schema named `Employee` like this:
 
-`$schema = (new Lucite\ApiSpec\Schema('Employee'))->addPropety($titleProp);`
+`$schema = (new Lucite\ApiSpec\Schema('Employee'))->addProperty($titleProp);`
 
 The root level of a specification is, unsurprisingly, a `Specification` object:
 
@@ -22,7 +22,7 @@ Other classes that are provided:
 - `Path`, which can be added to a `Specification` instance.
 - `Method`, which can be added to a `Path` instance.
 - `PathParameter`, which can be added to a `Method` instance.
-- `QueryParameter`, which can be added to a `QueryParameter` instance.
+- `QueryParameter`, which can be added to a `Method ` instance.
 - `Response`, which can be added to a `Method` instance.
 
 While these classes do not allow for the construction of any possible openapi specification, they cover many common cases.
