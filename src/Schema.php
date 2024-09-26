@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Lucite\ApiSpec;
 
-use Lucite\Apispec\Validator;
-
 class Schema implements SpecNodeInterface
 {
     public string $name;

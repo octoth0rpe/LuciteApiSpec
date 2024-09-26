@@ -12,8 +12,18 @@ class Validator
         $this->properties = $properties;
     }
 
-    public function validate(array $data): array | bool
+    public function validate(array &$data): array | bool
     {
+        $errors = [];
+        foreach ($this->properties as $property) {
+            $result = $property->validate($data);
+            if (is_string($result)) {
+                $errors[$property->name] = $result;
+            }
+        }
+        if (count($errors) > 0) {
+            return $errors;
+        }
         return true;
     }
 }
