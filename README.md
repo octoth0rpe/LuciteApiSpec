@@ -75,7 +75,7 @@ There are 4 response formats that may be returned from the above routes:
 	  "warnings": {/* object containing warnings */},
 	  "data": {/* schema properties here*/}
   }
-```
+  ```
 
   This structure is returned from successful requests to: `GET /books/{bookId}`, `POST /books/`, `PATCH /books/{bookId}`
 
@@ -91,8 +91,9 @@ There are 4 response formats that may be returned from the above routes:
 		{/* schema properties here*/},
 	  ]
   }
-```
-This structure is returned from successful requests to: `GET /books/`
+  ```
+
+  This structure is returned from successful requests to: `GET /books/`
 
 - An unsuccessul response such as:
 
@@ -103,6 +104,7 @@ This structure is returned from successful requests to: `GET /books/`
      "errors": {/* object containing errors */}
   }
   ```
+  
   This format is returned from `POST /books/` and `PATCH /books/{bookId}` when the request fails.
 
 - An empty response with status code such as:
