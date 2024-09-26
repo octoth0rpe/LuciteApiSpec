@@ -11,11 +11,11 @@ For example, you can create a string property named `title` with a minimum lengt
 
 You could then add that to a schema named `Employee` like this:
 
-`$schema = (new Schema('Employee'))->addPropety($titleProp);`
+`$schema = (new Lucite\ApiSpec\Schema('Employee'))->addPropety($titleProp);`
 
 The root level of a specification is, unsurprisingly, a `Specification` object:
 
-`$spec = new Specification('myapi', 'v1.1');`
+`$spec = new Lucite\ApiSpec\Specification('myapi', 'v1.1');`
 
 Other classes that are provided:
 
@@ -29,7 +29,7 @@ While these classes do not allow for the construction of any possible openapi sp
 
 ## Opinionated structure
 
-The `Specification` class has a number of shortcut methods that let you quickly build a highly opinionated API structure.
+The `Lucite\ApiSpec\Specification` class has a number of shortcut methods that let you quickly build a highly opinionated API structure.
 
 For a given resource type (say, a Book), one can easily add these 5 routes:
 
@@ -42,13 +42,13 @@ For a given resource type (say, a Book), one can easily add these 5 routes:
 To build something like this,
 
 ```php
-$bookSchema = Schema::create('Book')
+$bookSchema = (new Lucite\ApiSpec\Schema('Book'))
     ->addProperty(new Property('bookId', 'number'))
     ->addProperty(new Property('title', 'string', ['minLength' => 1]))
     ->addProperty(new Property('description', 'string'));
 
-$obj = new Specification('testspec', '1.2.3');
-    $obj->addRestMethods('/books/', $bookSchema);
+$spec = new Lucite\ApiSpec\Specification('testspec', '1.2.3');
+$spec->addRestMethods('/books/', $bookSchema);
 ```
 
 ### Request format
@@ -129,14 +129,16 @@ file_put_contents(
 Here's an example of how to use a Specification instance to map routes in Lumen or Slim. Other frameworks are probably very similar.
 
 ```php
-$bookSchema = Schema::create('Book')
-    ->addProperty(new Property('bookId', 'number'))
-    ->addProperty(new Property('title', 'string', ['minLength' => 1]))
-    ->addProperty(new Property('description', 'string'));
+$bookSchema = (new Lucite\ApiSpec\Schema('Book'))
+    ->addProperty(new Lucite\ApiSpec\Property('bookId', 'number'))
+    ->addProperty(new Lucite\ApiSpec\Property('title', 'string', ['minLength' => 1]))
+    ->addProperty(new Lucite\ApiSpec\Property('description', 'string'));
 
-$obj = new Specification('testspec', '1.2.3');
-$obj->addRestMethods('/books/', $bookSchema);
+$spec = new Lucite\ApiSpec\Specification('testspec', '1.2.3');
+$spec->addRestMethods('/books/', $bookSchema);
 
+
+$app = something(); # Framework dependent
 
 foreach ($spec->generateRoutes() as $method => $details) {
     [$path, $schemaName, $function] = $details;
@@ -162,7 +164,39 @@ foreach ($spec->generateRoutes() as $method => $details) {
     $app->$method($path, $schemaName.':'.$function);
 }
 ```
+
 ### Using Schema validators
 
-Coming soon.
+Once a schema is defined, you can create a Lucite\ApiSpec\Validator from it. The validator takes an array and returns EITHER:
+
+- a boolean true if the data passes validation
+- an associative array of errors
+
+Example:
+
+```php
+$bookSchema = (new Lucite\ApiSpec\Schema('Book'))
+    ->addProperty(new Lucite\ApiSpec\Property('bookId', 'number'))
+    ->addProperty(new Lucite\ApiSpec\Property('title', 'string', ['minLength' => 1]))
+    ->addProperty(new Lucite\ApiSpec\Property('description', 'string'));
+
+$data = ['name' => '']);
+$result = $bookSchema->getValidator->validate($data);
+# Will return an array containing: ['name' => '{field} must be at least 1 characters long']
+```
+
+You can get a validator for a schema from the specification object by schema name:
+
+```php
+$bookSchema = (new Lucite\ApiSpec\Schema('Book'))
+    ->addProperty(new Lucite\ApiSpec\Property('bookId', 'number'))
+    ->addProperty(new Lucite\ApiSpec\Property('title', 'string', ['minLength' => 1]))
+    ->addProperty(new Lucite\ApiSpec\Property('description', 'string'));
+
+$spec = new Lucite\ApiSpec\Specification('testspec', '1.2.3');
+$spec->addRestMethods('/books/', $bookSchema);
+$validator = $spec->getSchema('Book')->getValidator();
+```
+
+A good way to use this functionality would be to add the specification object to your dependency injection container, and then ->get() the spec/validator in a controller.
 
