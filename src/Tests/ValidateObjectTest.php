@@ -11,7 +11,7 @@ class ValidateObjectTest extends TestCase
 {
     public function testNotObject(): void
     {
-        $property = Property::create('prop', ['type' => 'object']);
+        $property = new Property('prop', 'object');
 
         $data = ['prop' => 6];
         $this->assertTrue(is_string($property->validate($data)));
@@ -43,7 +43,7 @@ class ValidateObjectTest extends TestCase
 
     public function testMinProperties(): void
     {
-        $property = Property::create('prop', ['type' => 'object', 'minProperties' => 2]);
+        $property = new Property('prop', 'object', ['minProperties' => 2]);
 
         $data = ['prop' => []];
         $this->assertTrue(is_string($property->validate($data)));
@@ -63,7 +63,7 @@ class ValidateObjectTest extends TestCase
 
     public function testMaxProperties(): void
     {
-        $property = Property::create('prop', ['type' => 'object', 'maxProperties' => 2]);
+        $property = new Property('prop', 'object', ['maxProperties' => 2]);
 
         $data = ['prop' => ['key1' => 1, 'key2' => 2, 'key3' => 3, 'key4' => 4]];
         $this->assertTrue(is_string($property->validate($data)));

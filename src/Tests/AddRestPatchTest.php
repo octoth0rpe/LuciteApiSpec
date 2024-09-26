@@ -14,9 +14,9 @@ class AddRestPatchTest extends TestCase
     public function testAddRestPatch(): void
     {
         $book = Schema::create('Book')
-            ->addProperty(Property::create('bookId', ['type' => 'integer']))
-            ->addProperty(Property::create('title'))
-            ->addProperty(Property::create('description'));
+            ->addProperty(new Property('bookId', 'integer'))
+            ->addProperty(new Property('title'))
+            ->addProperty(new Property('description'));
 
         $obj = new Specification('testspec', '1.0.0');
         $obj->addSchema($book);

@@ -11,7 +11,7 @@ class ValidateStringTest extends TestCase
 {
     public function testNotString(): void
     {
-        $property = Property::create('prop', ['type' => 'string']);
+        $property = new Property('prop', 'string');
 
         $data = ['prop' => false];
         $this->assertTrue(is_string($property->validate($data)));
@@ -31,7 +31,7 @@ class ValidateStringTest extends TestCase
 
     public function testStringMinLength(): void
     {
-        $property = Property::create('prop', ['type' => 'string', 'minLength' => 10]);
+        $property = new Property('prop', 'string', ['minLength' => 10]);
 
         $data = ['prop' => 'tooshort'];
         $this->assertTrue(is_string($property->validate($data)));
@@ -42,7 +42,7 @@ class ValidateStringTest extends TestCase
 
     public function testStringMaxLength(): void
     {
-        $property = Property::create('prop', ['type' => 'string', 'maxLength' => 12]);
+        $property = new Property('prop', 'string', ['maxLength' => 12]);
 
         $data = ['prop' => 'thisistoolong'];
         $this->assertTrue(is_string($property->validate($data)));
@@ -53,7 +53,7 @@ class ValidateStringTest extends TestCase
 
     public function testPattern(): void
     {
-        $property = Property::create('prop', ['type' => 'string', 'pattern' => '/^foo$/']);
+        $property = new Property('prop', 'string', ['pattern' => '/^foo$/']);
 
         $data = ['prop' => 'notfoo'];
         $this->assertTrue(is_string($property->validate($data)));
@@ -64,7 +64,7 @@ class ValidateStringTest extends TestCase
 
     public function testEnum(): void
     {
-        $property = Property::create('prop', ['type' => 'string', 'enum' => ['valid1', 'valid2']]);
+        $property = new Property('prop', 'string', ['enum' => ['valid1', 'valid2']]);
 
         $data = ['prop' => 'notvalid'];
         $this->assertTrue(is_string($property->validate($data)));
@@ -78,7 +78,7 @@ class ValidateStringTest extends TestCase
 
     public function testConst(): void
     {
-        $property = Property::create('prop', ['type' => 'string', 'const' => 'onlyvalid']);
+        $property = new Property('prop', 'string', ['const' => 'onlyvalid']);
 
         $data = ['prop' => 'notvalid'];
         $this->assertTrue(is_string($property->validate($data)));

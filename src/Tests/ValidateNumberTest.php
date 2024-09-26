@@ -11,7 +11,7 @@ class ValidateNumberTest extends TestCase
 {
     public function testNotNumber(): void
     {
-        $property = Property::create('prop', ['type' => 'number']);
+        $property = new Property('prop', 'number');
 
         $data = ['prop' => false];
         $this->assertTrue(is_string($property->validate($data)));
@@ -31,7 +31,7 @@ class ValidateNumberTest extends TestCase
 
     public function testEnum(): void
     {
-        $property = Property::create('prop', ['type' => 'number', 'enum' => [2, 3]]);
+        $property = new Property('prop', 'number', ['enum' => [2, 3]]);
 
         $data = ['prop' => 1];
         $this->assertTrue(is_string($property->validate($data)));
@@ -45,7 +45,7 @@ class ValidateNumberTest extends TestCase
 
     public function testConst(): void
     {
-        $property = Property::create('prop', ['type' => 'number', 'const' => 6]);
+        $property = new Property('prop', 'number', ['const' => 6]);
 
         $data = ['prop' => 1];
         $this->assertTrue(is_string($property->validate($data)));
@@ -56,7 +56,7 @@ class ValidateNumberTest extends TestCase
 
     public function testMinimum(): void
     {
-        $property = Property::create('prop', ['type' => 'number', 'minimum' => 6]);
+        $property = new Property('prop', 'number', ['minimum' => 6]);
 
         $data = ['prop' => 1];
         $this->assertTrue(is_string($property->validate($data)));
@@ -70,7 +70,7 @@ class ValidateNumberTest extends TestCase
 
     public function testExclusiveMinimum(): void
     {
-        $property = Property::create('prop', ['type' => 'number', 'exclusiveMinimum' => 6]);
+        $property = new Property('prop', 'number', ['exclusiveMinimum' => 6]);
 
         $data = ['prop' => 1];
         $this->assertTrue(is_string($property->validate($data)));
@@ -84,7 +84,7 @@ class ValidateNumberTest extends TestCase
 
     public function testMaximum(): void
     {
-        $property = Property::create('prop', ['type' => 'number', 'maximum' => 6]);
+        $property = new Property('prop', 'number', ['maximum' => 6]);
 
         $data = ['prop' => 7];
         $this->assertTrue(is_string($property->validate($data)));
@@ -98,7 +98,7 @@ class ValidateNumberTest extends TestCase
 
     public function testExclusiveMaximum(): void
     {
-        $property = Property::create('prop', ['type' => 'number', 'exclusiveMaximum' => 6]);
+        $property = new Property('prop', 'number', ['exclusiveMaximum' => 6]);
 
         $data = ['prop' => 7];
         $this->assertTrue(is_string($property->validate($data)));
@@ -112,7 +112,7 @@ class ValidateNumberTest extends TestCase
 
     public function testMultipleOf(): void
     {
-        $property = Property::create('prop', ['type' => 'number', 'multipleOf' => 3]);
+        $property = new Property('prop', 'number', ['multipleOf' => 3]);
 
         $data = ['prop' => 2];
         $this->assertTrue(is_string($property->validate($data)));

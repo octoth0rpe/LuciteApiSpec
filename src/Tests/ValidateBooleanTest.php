@@ -11,7 +11,7 @@ class ValidateBooleanTest extends TestCase
 {
     public function testNotBoolean(): void
     {
-        $property = Property::create('prop', ['type' => 'boolean']);
+        $property = new Property('prop', 'boolean');
 
         $data = ['prop' => 6];
         $this->assertTrue(is_string($property->validate($data)));
@@ -34,7 +34,7 @@ class ValidateBooleanTest extends TestCase
 
     public function testEnum(): void
     {
-        $property = Property::create('prop', ['type' => 'boolean', 'enum' => [true]]);
+        $property = new Property('prop', 'boolean', ['enum' => [true]]);
 
         $data = ['prop' => false];
         $this->assertTrue(is_string($property->validate($data)));
@@ -45,7 +45,7 @@ class ValidateBooleanTest extends TestCase
 
     public function testConst(): void
     {
-        $property = Property::create('prop', ['type' => 'boolean', 'const' => false]);
+        $property = new Property('prop', 'boolean', ['const' => false]);
 
         $data = ['prop' => true];
         $this->assertTrue(is_string($property->validate($data)));

@@ -7,45 +7,23 @@ namespace Lucite\ApiSpec;
 class Property implements SpecNodeInterface
 {
     public string $name;
-    public array $details;
+    public string $type;
+    public array $rules;
+    public bool $required;
 
-    public function __construct(string $name, array $details = ['type' => 'string'])
+    public function __construct(string $name, string $type = 'string', ?array $rules = null, ?bool $required = null)
     {
         $this->name = $name;
-        $this->details = [
-            'type' => $details['type'] ?? 'string',
-            'enum' => $details['enum'] ?? null,
-            'multipleOf' => $details['multipleOf'] ?? null,
-            'maximum' => $details['maximum'] ?? null,
-            'exclusiveMaximum' => $details['exclusiveMaximum'] ?? null,
-            'minimum' => $details['minimum'] ?? null,
-            'exclusiveMinimum' => $details['exclusiveMinimum'] ?? null,
-            'maxLength' => $details['maxLength'] ?? null,
-            'minLength' => $details['minLength'] ?? null,
-            'pattern' => $details['pattern'] ?? null,
-            'maxItems' => $details['maxItems'] ?? null,
-            'minItems' => $details['minItems'] ?? null,
-            'uniqueItems' => $details['uniqueItems'] ?? null,
-
-            # TODO: figure out how to support these
-            #'maxContains' => $details['maxContains'] ?? null,
-            #'minContains' => $details['minContains'] ?? null,
-
-            'maxProperties' => $details['maxProperties'] ?? null,
-            'minProperties' => $details['minProperties'] ?? null,
-        ];
-        if (isset($details['const'])) {
-            $this->details['const'] = $details['const'];
-        }
-    }
-
-    public static function create(string $name, array $details = ['type' => 'string']): Property
-    {
-        return new Property($name, $details);
+        $this->type = $type;
+        $this->rules = is_array($rules) ? $rules : [];
+        $this->required = $required === true || (is_array($rules) && count($rules) > 0);
     }
 
     public function validate(array &$data): bool | string
     {
+        if ($this->required === false && array_key_exists($this->name, $data) === false) {
+            return true;
+        }
         $value = $data[$this->name] ?? null;
         if (is_string($value)) {
             $value = trim($value);
@@ -53,7 +31,7 @@ class Property implements SpecNodeInterface
         }
 
         # Apply per type validation
-        switch ($this->details['type']) {
+        switch ($this->type) {
             case 'null':
                 if ($value !== null) {
                     return '{field} must be null';
@@ -62,23 +40,23 @@ class Property implements SpecNodeInterface
                 # be performed, so we can return true here.
                 return true;
             case 'string':
-                return static::validateString($value, $this->details);
+                return static::validateString($value, $this->rules);
             case 'boolean':
-                return static::validateBoolean($value, $this->details);
+                return static::validateBoolean($value, $this->rules);
             case 'array':
-                return static::validateArray($value, $this->details);
+                return static::validateArray($value, $this->rules);
             case 'number':
-                return static::validateNumber($value, $this->details);
+                return static::validateNumber($value, $this->rules);
             case 'object':
                 # TODO: figure out what kind of validation makes sense to implement
-                return static::validateObject($value, $this->details);
+                return static::validateObject($value, $this->rules);
             default:
-                throw new \Exception('Unknown property type: '.$this->details['type']);
+                throw new \Exception('Unknown property type: '.$this->type);
         }
         return true;
     }
 
-    public static function validateArray(mixed $value, array $details): bool | string
+    public static function validateArray(mixed $value, array $rules): bool | string
     {
         if (is_array($value) === false) {
             return '{field} must be an array';
@@ -87,110 +65,111 @@ class Property implements SpecNodeInterface
             return '{field} must be an array';
         }
         $itemCount = count($value);
-        if (isset($details['maxItems']) && $itemCount > $details['maxItems']) {
-            return '{field} must contain at most '.$details['maxItems'].' items';
+        if (isset($rules['maxItems']) && $itemCount > $rules['maxItems']) {
+            return '{field} must contain at most '.$rules['maxItems'].' items';
         }
-        if (isset($details['minItems']) && $itemCount < $details['minItems']) {
-            return '{field} must contain at least '.$details['minItems'].' items';
+        if (isset($rules['minItems']) && $itemCount < $rules['minItems']) {
+            return '{field} must contain at least '.$rules['minItems'].' items';
         }
-        if (isset($details['uniqueItems']) && $details['uniqueItems'] === true) {
+        if (isset($rules['uniqueItems']) && $rules['uniqueItems'] === true) {
             $uniqueItemCount = count(array_unique($value));
             if ($uniqueItemCount < $itemCount) {
-                return '{field} must contain at least '.$details['minItems'].' items';
+                return '{field} must contain at least '.$rules['uniqueItems'].' items';
             }
         }
         return true;
     }
 
-    public static function validateString(mixed $value, array $details): bool | string
+    public static function validateString(mixed $value, array $rules): bool | string
     {
         if (is_string($value) === false) {
             return '{field} must be a string';
         }
         $length = strlen($value);
-        if (isset($details['minLength']) && $length < $details['minLength']) {
-            return '{field} must be at least '.$details['minLength'].' characters long';
+        if (isset($rules['minLength']) && $length < $rules['minLength']) {
+            return '{field} must be at least '.$rules['minLength'].' characters long';
         }
-        if (isset($details['maxLength']) && $length > $details['maxLength']) {
-            return '{field} must be at most '.$details['maxLength'].' characters long';
+        if (isset($rules['maxLength']) && $length > $rules['maxLength']) {
+            return '{field} must be at most '.$rules['maxLength'].' characters long';
         }
-        if (isset($details['pattern'])) {
-            $result = preg_match($details['pattern'], $value);
+        if (isset($rules['pattern'])) {
+            $result = preg_match($rules['pattern'], $value);
             if ($result === false || $result === 0) {
-                return '{field} must match pattern '.$details['pattern'];
+                return '{field} must match pattern '.$rules['pattern'];
             }
         }
-        if (isset($details['enum']) && in_array($value, $details['enum']) === false) {
-            return '{field} must be one of '.implode(', ', $details['enum']);
+        if (isset($rules['enum']) && in_array($value, $rules['enum']) === false) {
+            return '{field} must be one of '.implode(', ', $rules['enum']);
         }
-        if (isset($details['const']) && $value !== $details['const']) {
-            return '{field} must be '.$details['const'];
+        if (isset($rules['const']) && $value !== $rules['const']) {
+            return '{field} must be '.$rules['const'];
         }
         return true;
     }
 
-    public static function validateBoolean(mixed $value, array $details): bool | string
+    public static function validateBoolean(mixed $value, array $rules): bool | string
     {
         if (is_bool($value) === false) {
             return '{field} must be a boolean';
         }
-        if (isset($details['enum']) && in_array($value, $details['enum']) === false) {
-            return '{field} must be one of '.implode(', ', $details['enum']);
+        if (isset($rules['enum']) && in_array($value, $rules['enum']) === false) {
+            return '{field} must be one of '.implode(', ', $rules['enum']);
         }
-        if (isset($details['const']) && $value !== $details['const']) {
-            return '{field} must be '.$details['const'];
+        if (isset($rules['const']) && $value !== $rules['const']) {
+            return '{field} must be '.$rules['const'];
         }
         return true;
     }
 
-    public static function validateNumber(mixed $value, array $details): bool | string
+    public static function validateNumber(mixed $value, array $rules): bool | string
     {
         if (is_numeric($value) === false) {
             return '{field} must be a number';
         }
-        if (isset($details['enum']) && in_array($value, $details['enum']) === false) {
-            return '{field} must be one of '.implode(', ', $details['enum']);
+        if (isset($rules['enum']) && in_array($value, $rules['enum']) === false) {
+            return '{field} must be one of '.implode(', ', $rules['enum']);
         }
-        if (isset($details['const']) && $value !== $details['const']) {
-            return '{field} must be '.$details['const'];
+        if (isset($rules['const']) && $value !== $rules['const']) {
+            return '{field} must be '.$rules['const'];
         }
-        if (isset($details['minimum']) && $value < $details['minimum']) {
-            return '{field} must be greater than or equal to '.$details['minimum'];
+        if (isset($rules['minimum']) && $value < $rules['minimum']) {
+            return '{field} must be greater than or equal to '.$rules['minimum'];
         }
-        if (isset($details['exclusiveMinimum']) && $value <= $details['exclusiveMinimum']) {
-            return '{field} must be greater than '.$details['exclusiveMinimum'];
+        if (isset($rules['exclusiveMinimum']) && $value <= $rules['exclusiveMinimum']) {
+            return '{field} must be greater than '.$rules['exclusiveMinimum'];
         }
-        if (isset($details['maximum']) && $value > $details['maximum']) {
-            return '{field} must be less than or equal to '.$details['maximum'];
+        if (isset($rules['maximum']) && $value > $rules['maximum']) {
+            return '{field} must be less than or equal to '.$rules['maximum'];
         }
-        if (isset($details['exclusiveMaximum']) && $value >= $details['exclusiveMaximum']) {
-            return '{field} must be less than '.$details['exclusiveMaximum'];
+        if (isset($rules['exclusiveMaximum']) && $value >= $rules['exclusiveMaximum']) {
+            return '{field} must be less than '.$rules['exclusiveMaximum'];
         }
-        if (isset($details['multipleOf']) && ($value % $details['multipleOf']) !== 0) {
-            return '{field} must be a multiple of '.$details['multipleOf'];
+        if (isset($rules['multipleOf']) && ($value % $rules['multipleOf']) !== 0) {
+            return '{field} must be a multiple of '.$rules['multipleOf'];
         }
         return true;
     }
 
-    public static function validateObject(mixed $value, array $details): bool | string
+    public static function validateObject(mixed $value, array $rules): bool | string
     {
         if (is_array($value) === false || array_is_list($value) === true) {
             return '{field} must be an object';
         }
         $keyCount = count(array_keys($value));
-        if (isset($details['minProperties']) && $keyCount < $details['minProperties']) {
-            return '{field} must have at least '.$details['minProperties'].' properties';
+        if (isset($rules['minProperties']) && $keyCount < $rules['minProperties']) {
+            return '{field} must have at least '.$rules['minProperties'].' properties';
         }
-        if (isset($details['maxProperties']) && $keyCount > $details['maxProperties']) {
-            return '{field} must have at most '.$details['maxProperties'].' properties';
+        if (isset($rules['maxProperties']) && $keyCount > $rules['maxProperties']) {
+            return '{field} must have at most '.$rules['maxProperties'].' properties';
         }
         return true;
     }
 
     public function finalize(): array
     {
-        return array_filter($this->details, function ($value) {
-            return $value !== null;
-        });
+        return array_merge(
+            ['type' => $this->type],
+            $this->rules,
+        );
     }
 }

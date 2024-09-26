@@ -11,7 +11,7 @@ class FinalizePropertyTest extends TestCase
 {
     public function testFinalizePath(): void
     {
-        $obj = Property::create('id', ['type' => 'string']);
+        $obj = new Property('id');
         $finalized = $obj->finalize();
         $keys = array_keys($finalized);
         sort($keys);

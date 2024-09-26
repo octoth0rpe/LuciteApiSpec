@@ -11,7 +11,7 @@ class ValidateArrayTest extends TestCase
 {
     public function testNotArray(): void
     {
-        $property = Property::create('prop', ['type' => 'array']);
+        $property = new Property('prop', 'array');
 
         $data = ['prop' => 6];
         $this->assertTrue(is_string($property->validate($data)));
@@ -39,7 +39,7 @@ class ValidateArrayTest extends TestCase
 
     public function testMinItems(): void
     {
-        $property = Property::create('prop', ['type' => 'array', 'minItems' => 2]);
+        $property = new Property('prop', 'array', ['minItems' => 2]);
 
         $data = ['prop' => [1]];
         $this->assertTrue(is_string($property->validate($data)));
@@ -53,7 +53,7 @@ class ValidateArrayTest extends TestCase
 
     public function testMaxItems(): void
     {
-        $property = Property::create('prop', ['type' => 'array', 'maxItems' => 3]);
+        $property = new Property('prop', 'array', ['maxItems' => 3]);
 
         $data = ['prop' => [1, 2, 3, 4]];
         $this->assertTrue(is_string($property->validate($data)));
@@ -68,14 +68,14 @@ class ValidateArrayTest extends TestCase
 
     public function testUniqueItems(): void
     {
-        $propertyNotRequiringUnique = Property::create('prop', ['type' => 'array', 'uniqueItems' => false]);
+        $propertyNotRequiringUnique = new Property('prop', 'array', ['uniqueItems' => false]);
         $data = ['prop' => [1, 2, 2]];
         $this->assertTrue($propertyNotRequiringUnique->validate($data));
 
         $data = ['prop' => [1, 2, 3]];
         $this->assertTrue($propertyNotRequiringUnique->validate($data));
 
-        $propertyRequiringUnique = Property::create('prop', ['type' => 'array', 'uniqueItems' => true]);
+        $propertyRequiringUnique = new Property('prop', 'array', ['uniqueItems' => true]);
 
         $data = ['prop' => [1, 2, 2]];
         $this->assertTrue(is_string($propertyRequiringUnique->validate($data)));

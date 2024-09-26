@@ -25,8 +25,8 @@ class FinalizeSchemaTest extends TestCase
     public function testConvertSchemaWithProperties(): void
     {
         $obj = new Schema('scheme1');
-        $obj->addProperty(Property::create('id', ['type' => 'string']));
-        $obj->addProperty(Property::create('name', ['type' => 'string']));
+        $obj->addProperty(new Property('id'));
+        $obj->addProperty(new Property('name'));
         $finalized = $obj->finalize();
         $keys = array_keys($finalized);
         sort($keys);

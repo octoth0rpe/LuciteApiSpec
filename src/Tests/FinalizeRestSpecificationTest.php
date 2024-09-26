@@ -14,17 +14,17 @@ class FinalizeRestSpecificationTest extends TestCase
     public function testConvertedSpec(): void
     {
         $bookSchema = Schema::create('Book')
-            ->addProperty(Property::create('bookId', ['type' => 'integer']))
-            ->addProperty(Property::create('title', ['minLength' => 1, 'maxLength' => 255]))
-            ->addProperty(Property::create('description', ['minLength' => 0, 'maxLength' => 8000]));
+            ->addProperty(new Property('bookId', 'number'))
+            ->addProperty(new Property('title', 'string', ['minLength' => 1, 'maxLength' => 255]))
+            ->addProperty(new Property('description', 'string', ['minLength' => 0, 'maxLength' => 8000]));
         $authorSchema = Schema::create('Author')
-            ->addProperty(Property::create('authorId', ['type' => 'integer']))
-            ->addProperty(Property::create('bookId', ['type' => 'integer']))
-            ->addProperty(Property::create('name'));
+            ->addProperty(new Property('authorId', 'number'))
+            ->addProperty(new Property('bookId', 'number'))
+            ->addProperty(new Property('name'));
         $saleSchema = Schema::create('Sale')
-            ->addProperty(Property::create('saleId', ['type' => 'integer']))
-            ->addProperty(Property::create('bookId', ['type' => 'integer']))
-            ->addProperty(Property::create('quantity', ['type' => 'integer']));
+            ->addProperty(new Property('saleId', 'number'))
+            ->addProperty(new Property('bookId', 'number'))
+            ->addProperty(new Property('quantity', 'number'));
 
         $obj = new Specification('testspec', '1.2.3');
         $obj->addRestMethods('/books/', $bookSchema);

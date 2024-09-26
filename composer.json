@@ -20,6 +20,6 @@
     "require": {},
     "scripts": {
       "format": "pint --preset psr12",
-      "test": "phpunit --stderr src/Tests/"
+      "test": "phpunit --stderr --fail-on-warning src/Tests/"
     }
 }
