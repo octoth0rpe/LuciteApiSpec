@@ -71,7 +71,7 @@ class Property implements SpecNodeInterface
                 return static::validateNumber($value, $this->details);
             case 'object':
                 # TODO: figure out what kind of validation makes sense to implement
-                return true;
+                return static::validateObject($value, $this->details);
             default:
                 throw new \Exception('Unknown property type: '.$this->details['type']);
         }
@@ -81,6 +81,9 @@ class Property implements SpecNodeInterface
     public static function validateArray(mixed $value, array $details): bool | string
     {
         if (is_array($value) === false) {
+            return '{field} must be an array';
+        }
+        if (array_is_list($value) === false) {
             return '{field} must be an array';
         }
         $itemCount = count($value);
@@ -165,6 +168,21 @@ class Property implements SpecNodeInterface
         }
         if (isset($details['multipleOf']) && ($value % $details['multipleOf']) !== 0) {
             return '{field} must be a multiple of '.$details['multipleOf'];
+        }
+        return true;
+    }
+
+    public static function validateObject(mixed $value, array $details): bool | string
+    {
+        if (is_array($value) === false || array_is_list($value) === true) {
+            return '{field} must be an object';
+        }
+        $keyCount = count(array_keys($value));
+        if (isset($details['minProperties']) && $keyCount < $details['minProperties']) {
+            return '{field} must have at least '.$details['minProperties'].' properties';
+        }
+        if (isset($details['maxProperties']) && $keyCount > $details['maxProperties']) {
+            return '{field} must have at most '.$details['maxProperties'].' properties';
         }
         return true;
     }

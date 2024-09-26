@@ -27,6 +27,9 @@ class ValidateArrayTest extends TestCase
         $data = ['prop' => true];
         $this->assertTrue(is_string($property->validate($data)));
 
+        $data = ['prop' => ['key1', 'key2' => true]];
+        $this->assertTrue(is_string($property->validate($data)));
+
         $data = ['prop' => []];
         $this->assertTrue($property->validate($data));
 
