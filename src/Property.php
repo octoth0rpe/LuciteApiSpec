@@ -49,7 +49,7 @@ class Property implements SpecNodeInterface
             $data[$this->name] = $value;
         }
 
-        # Validate type
+        # Apply per type validation
         switch ($this->details['type']) {
             case 'null':
                 if ($value !== null) {
@@ -67,6 +67,7 @@ class Property implements SpecNodeInterface
             case 'number':
                 return static::validateNumber($value, $this->details);
             case 'object':
+                # TODO: figure out what kind of validation makes sense to implement
                 return true;
             default:
                 throw new \Exception('Unknown property type: '.$this->details['type']);
@@ -114,7 +115,7 @@ class Property implements SpecNodeInterface
         if (is_bool($value) === false) {
             return '{field} must be a boolean';
         }
-        if (isset($details['enum']) && in_array($value, $details['enum'])) {
+        if (isset($details['enum']) && in_array($value, $details['enum']) === false) {
             return '{field} must be one of '.implode(', ', $details['enum']);
         }
         if (isset($details['const']) && $value !== $details['const']) {
@@ -128,11 +129,26 @@ class Property implements SpecNodeInterface
         if (is_numeric($value) === false) {
             return '{field} must be a number';
         }
-        if (isset($details['enum']) && in_array($value, $details['enum'])) {
+        if (isset($details['enum']) && in_array($value, $details['enum']) === false) {
             return '{field} must be one of '.implode(', ', $details['enum']);
         }
         if (isset($details['const']) && $value !== $details['const']) {
             return '{field} must be '.$details['const'];
+        }
+        if (isset($details['minimum']) && $value < $details['minimum']) {
+            return '{field} must be greater than or equal to '.$details['minimum'];
+        }
+        if (isset($details['exclusiveMinimum']) && $value <= $details['exclusiveMinimum']) {
+            return '{field} must be greater than '.$details['exclusiveMinimum'];
+        }
+        if (isset($details['maximum']) && $value > $details['maximum']) {
+            return '{field} must be less than or equal to '.$details['maximum'];
+        }
+        if (isset($details['exclusiveMaximum']) && $value >= $details['exclusiveMaximum']) {
+            return '{field} must be less than '.$details['exclusiveMaximum'];
+        }
+        if (isset($details['multipleOf']) && ($value % $details['multipleOf']) !== 0) {
+            return '{field} must be evenly divisible by '.$details['multipleOf'];
         }
         return true;
     }
