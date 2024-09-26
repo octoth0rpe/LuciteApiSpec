@@ -76,7 +76,8 @@ There are 4 response formats that may be returned from the above routes:
 	  "data": {/* schema properties here*/}
   }
 ```
-This structure is returned from successful requests to: `GET /books/{bookId}`, `POST /books/`, `PATCH /books/{bookId}`
+
+  This structure is returned from successful requests to: `GET /books/{bookId}`, `POST /books/`, `PATCH /books/{bookId}`
 
 - A successful collection of resources such as:
 
