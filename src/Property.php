@@ -26,8 +26,11 @@ class Property implements SpecNodeInterface
             'maxItems' => $details['maxItems'] ?? null,
             'minItems' => $details['minItems'] ?? null,
             'uniqueItems' => $details['uniqueItems'] ?? null,
-            'maxContains' => $details['maxContains'] ?? null,
-            'minContains' => $details['minContains'] ?? null,
+
+            # TODO: figure out how to support these
+            #'maxContains' => $details['maxContains'] ?? null,
+            #'minContains' => $details['minContains'] ?? null,
+
             'maxProperties' => $details['maxProperties'] ?? null,
             'minProperties' => $details['minProperties'] ?? null,
         ];
@@ -79,6 +82,19 @@ class Property implements SpecNodeInterface
     {
         if (is_array($value) === false) {
             return '{field} must be an array';
+        }
+        $itemCount = count($value);
+        if (isset($details['maxItems']) && $itemCount > $details['maxItems']) {
+            return '{field} must contain at most '.$details['maxItems'].' items';
+        }
+        if (isset($details['minItems']) && $itemCount < $details['minItems']) {
+            return '{field} must contain at least '.$details['minItems'].' items';
+        }
+        if (isset($details['uniqueItems']) && $details['uniqueItems'] === true) {
+            $uniqueItemCount = count(array_unique($value));
+            if ($uniqueItemCount < $itemCount) {
+                return '{field} must contain at least '.$details['minItems'].' items';
+            }
         }
         return true;
     }
@@ -148,7 +164,7 @@ class Property implements SpecNodeInterface
             return '{field} must be less than '.$details['exclusiveMaximum'];
         }
         if (isset($details['multipleOf']) && ($value % $details['multipleOf']) !== 0) {
-            return '{field} must be evenly divisible by '.$details['multipleOf'];
+            return '{field} must be a multiple of '.$details['multipleOf'];
         }
         return true;
     }
