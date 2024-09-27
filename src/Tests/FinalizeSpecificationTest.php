@@ -37,9 +37,9 @@ class FinalizeSpecificationTest extends TestCase
     {
         $obj = new Specification('testspec', '1.0.0');
         $obj
-            ->addSchema(Schema::create('Book'), false, false)
-            ->addSchema(Schema::create('Author'), false, false)
-            ->addSchema(Schema::create('Sale'), false, false);
+            ->addSchema(Schema::create('Book'), false)
+            ->addSchema(Schema::create('Author'), false)
+            ->addSchema(Schema::create('Sale'), false);
 
         $finalized = $obj->finalize();
 
@@ -56,24 +56,21 @@ class FinalizeSpecificationTest extends TestCase
     {
         $obj = new Specification('testspec', '1.0.0');
         $obj
-            ->addSchema(Schema::create('Book'), true, true)
-            ->addSchema(Schema::create('Author'), true, true)
-            ->addSchema(Schema::create('Sale'), true, true);
+            ->addSchema(Schema::create('Book'), true)
+            ->addSchema(Schema::create('Author'), true)
+            ->addSchema(Schema::create('Sale'), true);
 
         $finalized = $obj->finalize();
 
         $schema_keys = array_keys($finalized['components']['schemas'] ?? []);
         sort($schema_keys);
 
-        $this->assertEquals(9, count($schema_keys));
+        $this->assertEquals(6, count($schema_keys));
         $this->assertEquals('Author', $schema_keys[0]);
         $this->assertEquals('AuthorCreate', $schema_keys[1]);
-        $this->assertEquals('AuthorList', $schema_keys[2]);
-        $this->assertEquals('Book', $schema_keys[3]);
-        $this->assertEquals('BookCreate', $schema_keys[4]);
-        $this->assertEquals('BookList', $schema_keys[5]);
-        $this->assertEquals('Sale', $schema_keys[6]);
-        $this->assertEquals('SaleCreate', $schema_keys[7]);
-        $this->assertEquals('SaleList', $schema_keys[8]);
+        $this->assertEquals('Book', $schema_keys[2]);
+        $this->assertEquals('BookCreate', $schema_keys[3]);
+        $this->assertEquals('Sale', $schema_keys[4]);
+        $this->assertEquals('SaleCreate', $schema_keys[5]);
     }
 }

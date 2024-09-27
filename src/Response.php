@@ -9,12 +9,14 @@ class Response implements SpecNodeInterface
     public string $code;
     public string $description;
     public ?string $schema = null;
+    public bool $multiple;
 
-    public function __construct(string $code, string $description, ?string $schema = null)
+    public function __construct(string $code, string $description, ?string $schema = null, bool $multiple = false)
     {
         $this->code = $code;
         $this->description = $description;
         $this->schema = $schema;
+        $this->multiple = $multiple;
     }
 
     public static function create(string $code, string $description, ?string $schema = null): Response
@@ -55,7 +57,16 @@ class Response implements SpecNodeInterface
             ];
         }
         if ($this->schema !== null) {
-
+            $data = [
+                '$ref' => '#/components/schemas/'.$this->schema,
+            ];
+            if ($this->multiple) {
+                # $data = {"type":"array","items":{"$ref":"#\/components\/schemas\/Sale"}}
+                $data = [
+                    "type" => "array",
+                    "items" => $data,
+                ];
+            }
             if (str_starts_with($this->code, '2')) {
                 $response['content'] = [
                     'application/json' => [
@@ -72,9 +83,7 @@ class Response implements SpecNodeInterface
                                         'type' => 'string',
                                     ],
                                 ],
-                                'data' => [
-                                    '$ref' => '#/components/schemas/'.$this->schema,
-                                ],
+                                'data' => $data,
                             ],
                         ],
                     ],

@@ -23,14 +23,9 @@ class Specification implements SpecNodeInterface
         $this->description = $description;
     }
 
-    public function addSchema(Schema $newSchema, bool $addPlural = true, bool $addCreateVariant = true): Specification
+    public function addSchema(Schema $newSchema, bool $addCreateVariant = true): Specification
     {
         $this->schemas[$newSchema->name] = $newSchema;
-
-        if ($addPlural) {
-            $plural = $newSchema->name.'List';
-            $this->schemas[$plural] = new ArraySchema($plural, $newSchema->name);
-        }
 
         if ($addCreateVariant) {
             $createSchema = clone $newSchema;
@@ -63,20 +58,14 @@ class Specification implements SpecNodeInterface
 
     public function addRestGet(string $url, Schema $schema): Specification
     {
-        $pluralSchema = null;
-        foreach ($this->schemas as $possiblePluralSchema) {
-            if ($possiblePluralSchema->usesBaseSchema($schema)) {
-                $pluralSchema = $possiblePluralSchema;
-            }
-        }
         $primaryKey = $schema->primaryKey();
 
         if (isset($this->paths[$url]) === false) {
             $this->addPath(Path::create($url));
         }
         $this->paths[$url]->addMethod(
-            Method::create('get', 'Fetch a collection of '.$schema->name.' resources', 'get'.$pluralSchema->name, $schema)
-                ->addResponse(Response::create('200', '', $pluralSchema->name))
+            Method::create('get', 'Fetch a collection of '.$schema->name.' resources', 'get'.$schema->name.'Collection', $schema)
+                ->addResponse(new Response('200', '', $schema->name, true))
         );
 
         $getOneUrl = $url.'{'.$primaryKey->name.'}';
@@ -86,8 +75,8 @@ class Specification implements SpecNodeInterface
         $this->paths[$getOneUrl]->addMethod(
             Method::create('get', 'Fetch a single '.$schema->name.' resource', 'get'.$schema->name, $schema)
                 ->addParameter(PathParameter::create($primaryKey->name, 'The '.$primaryKey->name.' of the resource to fetch', true, 'integer'))
-                ->addResponse(Response::create('200', '', $schema->name))
-                ->addResponse(Response::create('404', 'Not Found'))
+                ->addResponse(new Response('200', '', $schema->name))
+                ->addResponse(new Response('404', 'Not Found'))
         );
 
         return $this;
@@ -107,10 +96,10 @@ class Specification implements SpecNodeInterface
         }
 
         $this->paths[$url]->addMethod(
-            Method::create('post', 'Create a new '.$schema->name.' resource', 'create'.$schema->name, $schema)
-                ->addResponse(Response::create('201', 'Successfully created', $schema->name))
-                ->addResponse(Response::create('401', 'Not Authorized'))
-                ->addResponse(Response::create('422', 'Validation Error'))
+            Method::create('post', 'Create a new '.$schema->name.' resource', 'create'.$schema->name, $createSchema)
+                ->addResponse(new Response('201', 'Successfully created', $schema->name))
+                ->addResponse(new Response('401', 'Not Authorized'))
+                ->addResponse(new Response('422', 'Validation Error'))
         );
 
         return $this;
@@ -127,10 +116,10 @@ class Specification implements SpecNodeInterface
         $this->paths[$url]->addMethod(
             Method::create('patch', 'Update an existing '.$schema->name.' resource', 'update'.$schema->name, $schema)
                 ->addParameter(PathParameter::create($primaryKey->name, 'The '.$primaryKey->name.' of the resource to fetch', true, 'integer'))
-                ->addResponse(Response::create('201', 'Successfully updated', $schema->name))
-                ->addResponse(Response::create('401', 'Not Authorized'))
-                ->addResponse(Response::create('404', 'Not Found'))
-                ->addResponse(Response::create('422', 'Validation Error'))
+                ->addResponse(new Response('201', 'Successfully updated', $schema->name))
+                ->addResponse(new Response('401', 'Not Authorized'))
+                ->addResponse(new Response('404', 'Not Found'))
+                ->addResponse(new Response('422', 'Validation Error'))
         );
 
         return $this;
@@ -147,9 +136,9 @@ class Specification implements SpecNodeInterface
         $this->paths[$url]->addMethod(
             Method::create('delete', 'Delete a '.$schema->name.' resource', 'delete'.$schema->name, $schema)
                 ->addParameter(PathParameter::create($primaryKey->name, 'The '.$primaryKey->name.' of the resource to delete', true, 'integer'))
-                ->addResponse(Response::create('204', 'Deleted'))
-                ->addResponse(Response::create('401', 'Not Authorized'))
-                ->addResponse(Response::create('404', 'Not Found'))
+                ->addResponse(new Response('204', 'Deleted'))
+                ->addResponse(new Response('401', 'Not Authorized'))
+                ->addResponse(new Response('404', 'Not Found'))
         );
         return $this;
     }
@@ -193,7 +182,11 @@ class Specification implements SpecNodeInterface
                         $function = 'delete';
                         break;
                 }
-                yield $method->method => [$path->path, $method->schema->name, $function];
+                $schemaName = $method->schema->name;
+                if (str_ends_with($schemaName, 'Create')) {
+                    $schemaName = substr($schemaName, 0, strlen($schemaName) - 6);
+                }
+                yield $method->method => [$path->path, $schemaName, $function];
             }
         }
     }
