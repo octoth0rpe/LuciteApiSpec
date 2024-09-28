@@ -45,7 +45,7 @@ class FinalizeSchemaTest extends TestCase
         $finalized = $schema->finalize();
         $keys = array_keys($finalized);
         sort($keys);
-        
+
         $this->assertEquals(3, count($keys));
         $this->assertEquals('properties', $keys[0]);
         $this->assertEquals('required', $keys[1]);

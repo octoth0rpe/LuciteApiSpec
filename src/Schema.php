@@ -55,7 +55,7 @@ class Schema implements SpecNodeInterface
         if (count($required) > 0) {
             $finalized['required'] = $required;
         }
-        
+
         if (count($this->properties) > 0) {
             $finalized['properties'] = [];
             foreach ($this->properties as $property) {

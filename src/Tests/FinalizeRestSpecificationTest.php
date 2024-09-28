@@ -22,7 +22,7 @@ class FinalizeRestSpecificationTest extends TestCase
             ->addProperty(new Property('bookId', type: 'number'))
             ->addProperty(new Property('name'));
         $saleSchema = (new Schema('Sale'))
-            ->addProperty(new Property('saleId', type: 'number'))
+            ->addProperty(new Property('saleId', type: 'number', primaryKey: true))
             ->addProperty(new Property('bookId', type: 'number'))
             ->addProperty(new Property('quantity', type: 'number'));
 

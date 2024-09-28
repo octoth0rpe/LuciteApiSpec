@@ -178,8 +178,15 @@ class Property implements SpecNodeInterface
 
     public function finalize(): array
     {
+        $base = ['type' => $this->type];
+        if ($this->readOnly) {
+            $base['readOnly'] = true;
+        }
+        if ($this->writeOnly) {
+            $base['writeOnly'] = true;
+        }
         return array_merge(
-            ['type' => $this->type],
+            $base,
             $this->rules,
         );
     }
