@@ -13,10 +13,10 @@ class SchemaValidatorTest extends TestCase
     public function testRulesAreApplied(): void
     {
         $schema = (new Schema('scheme1'))
-            ->addProperty(new Property('id', 'number'))
-            ->addProperty(new Property('name', 'string', ['minLength' => 1, 'maxLength' => 5]))
-            ->addProperty(new Property('tags', 'array', ['maxItems' => 3, 'uniqueItems' => true]))
-            ->addProperty(new Property('public', 'boolean'));
+            ->addProperty(new Property('id', type: 'number'))
+            ->addProperty(new Property('name', rules: ['minLength' => 1, 'maxLength' => 5]))
+            ->addProperty(new Property('tags', type: 'array', rules: ['maxItems' => 3, 'uniqueItems' => true]))
+            ->addProperty(new Property('public', type: 'boolean'));
         $validator = $schema->getValidator();
 
         $data = [
@@ -56,7 +56,7 @@ class SchemaValidatorTest extends TestCase
     public function testStringsAreTrimmed(): void
     {
         $schema = (new Schema('scheme1'))
-            ->addProperty(new Property('id', 'number'))
+            ->addProperty(new Property('id', type: 'number'))
             ->addProperty(new Property('name'));
         $validator = $schema->getValidator();
 
