@@ -17,7 +17,9 @@
             "email": "mthorn.work@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+      "php": "^8"
+    },
     "scripts": {
       "format": "pint --preset psr12",
       "test": "phpunit --stderr --fail-on-warning src/Tests/"

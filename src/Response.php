@@ -19,11 +19,6 @@ class Response implements SpecNodeInterface
         $this->multiple = $multiple;
     }
 
-    public static function create(string $code, string $description, ?string $schema = null): Response
-    {
-        return new Response($code, $description, $schema);
-    }
-
     public function finalize(): array
     {
         $response = [

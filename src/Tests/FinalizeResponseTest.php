@@ -11,7 +11,7 @@ class FinalizeResponseTest extends TestCase
 {
     public function testFinalizeResponseWithoutSchema(): void
     {
-        $obj = Response::create('200', 'a successful response');
+        $obj = new Response('200', 'a successful response');
         $finalized = $obj->finalize();
         $keys = array_keys($finalized);
         sort($keys);
@@ -23,7 +23,7 @@ class FinalizeResponseTest extends TestCase
 
     public function testFinalizeResponseWithSchema(): void
     {
-        $obj = Response::create('200', 'a successful response with schema', 'TestSchema');
+        $obj = new Response('200', 'a successful response with schema', 'TestSchema');
         $finalized = $obj->finalize();
         $keys = array_keys($finalized);
         sort($keys);

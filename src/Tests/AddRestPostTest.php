@@ -13,8 +13,8 @@ class AddRestPostTest extends TestCase
 {
     public function testAddRestPost(): void
     {
-        $book = Schema::create('Book')
-            ->addProperty(new Property('bookId', 'integer'))
+        $book = (new Schema('Book'))
+            ->addProperty(new Property('bookId', type: 'integer'))
             ->addProperty(new Property('title'))
             ->addProperty(new Property('description'));
 

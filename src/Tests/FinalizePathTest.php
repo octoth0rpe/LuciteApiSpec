@@ -12,9 +12,9 @@ class FinalizePathTest extends TestCase
 {
     public function testFinalizePath(): void
     {
-        $obj = Path::create('/testurl')
-            ->addMethod(Method::create('get', 'get method summary', 'getSomething'))
-            ->addMethod(Method::create('post', 'post method summary', 'createSomething'));
+        $obj = (new Path('/testurl'))
+            ->addMethod(new Method('get', 'get method summary', 'getSomething'))
+            ->addMethod(new Method('post', 'post method summary', 'createSomething'));
         $finalized = $obj->finalize();
         $keys = array_keys($finalized);
         sort($keys);

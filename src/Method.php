@@ -69,9 +69,4 @@ class Method implements SpecNodeInterface
         $this->parameters[] = $newParameter;
         return $this;
     }
-
-    public static function create(string $method, string $summary, string $operationId, ?Schema $schema = null): Method
-    {
-        return new Method($method, $summary, $operationId, $schema);
-    }
 }

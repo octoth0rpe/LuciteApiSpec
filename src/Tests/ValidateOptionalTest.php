@@ -13,7 +13,7 @@ class ValidateOptionalTest extends TestCase
     public function testIgnoreMissingOptionalValues(): void
     {
         $schema = (new Schema('scheme1'))
-            ->addProperty(new Property('id', 'number'))
+            ->addProperty(new Property('id', 'number', [], false, true))
             ->addProperty(new Property('name', 'string', [], true))
             ->addProperty(new Property('description', 'string'));
 
@@ -27,7 +27,7 @@ class ValidateOptionalTest extends TestCase
     public function testErrorOnMissingRequiredValues(): void
     {
         $schema = (new Schema('scheme1'))
-            ->addProperty(new Property('id', 'number'))
+            ->addProperty(new Property('id', 'number', [], false, true))
             ->addProperty(new Property('name', 'string', [], true))
             ->addProperty(new Property('description', 'string'));
 

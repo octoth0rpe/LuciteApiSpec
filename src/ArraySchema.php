@@ -15,11 +15,6 @@ class ArraySchema extends Schema implements SpecNodeInterface
         $this->baseSchema = $baseSchema;
     }
 
-    public static function createArray(string $name, string $baseSchema): ArraySchema
-    {
-        return new ArraySchema($name, $baseSchema);
-    }
-
     public function usesBaseSchema(Schema $baseSchema): bool
     {
         return $this->baseSchema === $baseSchema->name;

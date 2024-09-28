@@ -11,8 +11,8 @@ class FinalizeQueryParameterTest extends TestCase
 {
     public function testFinalizeQueryParameter(): void
     {
-        $obj = QueryParameter::create('testParam', 'parameter passed in querystring', false, 'integer');
-        $finalized = $obj->finalize();
+        $param = new QueryParameter('testParam', description: 'parameter passed in querystring', required: false, type: 'integer');
+        $finalized = $param->finalize();
         $keys = array_keys($finalized);
         sort($keys);
 

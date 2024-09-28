@@ -13,8 +13,8 @@ class FinalizeMethodTest extends TestCase
 {
     public function testFinalizeMethodWithoutSchema(): void
     {
-        $obj = Method::create('get', 'a get request', 'getResource');
-        $finalized = $obj->finalize();
+        $method = new Method('get', 'a get request', 'getResource');
+        $finalized = $method->finalize();
         $keys = array_keys($finalized);
         sort($keys);
 
@@ -27,9 +27,9 @@ class FinalizeMethodTest extends TestCase
 
     public function testFinalizeMethodWithSchema(): void
     {
-        $schema = Schema::create('Test');
-        $obj = Method::create('post', 'a get request', 'getResource', $schema);
-        $finalized = $obj->finalize();
+        $schema = new Schema('Test');
+        $method = new Method('post', 'a get request', 'getResource', $schema);
+        $finalized = $method->finalize();
 
         $schema = $finalized['requestBody']['content']['application/json']['schema'];
         $this->assertEquals(
@@ -41,12 +41,12 @@ class FinalizeMethodTest extends TestCase
 
     public function testFinalizeMethodWithQueryParameter(): void
     {
-        $schema = Schema::create('Test');
-        $obj = Method::create('get', 'a get request', 'getResource', $schema);
-        $obj
-            ->addParameter(QueryParameter::create('param1', 'firstParameter', false, 'string'))
-            ->addParameter(QueryParameter::create('param2', 'secondParameter', false, 'string'));
-        $finalized = $obj->finalize();
+        $schema = new Schema('Test');
+        $method = new Method('get', 'a get request', 'getResource', $schema);
+        $method
+            ->addParameter(new QueryParameter('param1', 'firstParameter', false, 'string'))
+            ->addParameter(new QueryParameter('param2', 'secondParameter', false, 'string'));
+        $finalized = $method->finalize();
 
         $this->assertEquals(2, count($finalized['parameters']));
         $this->assertEquals('param1', $finalized['parameters'][0]['name']);

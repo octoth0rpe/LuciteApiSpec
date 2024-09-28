@@ -13,26 +13,26 @@ class FinalizeRestSpecificationTest extends TestCase
 {
     public function testConvertedSpec(): void
     {
-        $bookSchema = Schema::create('Book')
+        $bookSchema = (new Schema('Book'))
             ->addProperty(new Property('bookId', 'number'))
             ->addProperty(new Property('title', 'string', ['minLength' => 1, 'maxLength' => 255]))
             ->addProperty(new Property('description', 'string', ['minLength' => 0, 'maxLength' => 8000]));
-        $authorSchema = Schema::create('Author')
+        $authorSchema = (new Schema('Author'))
             ->addProperty(new Property('authorId', 'number'))
             ->addProperty(new Property('bookId', 'number'))
             ->addProperty(new Property('name'));
-        $saleSchema = Schema::create('Sale')
+        $saleSchema = (new Schema('Sale'))
             ->addProperty(new Property('saleId', 'number'))
             ->addProperty(new Property('bookId', 'number'))
             ->addProperty(new Property('quantity', 'number'));
 
-        $obj = new Specification('testspec', '1.2.3');
-        $obj->addRestMethods('/books/', $bookSchema);
-        $obj->addRestMethods('/authors/', $authorSchema);
-        $obj->addRestMethods('/sales/', $saleSchema);
+        $spec = new Specification('testspec', '1.2.3');
+        $spec->addRestMethods('/books/', $bookSchema);
+        $spec->addRestMethods('/authors/', $authorSchema);
+        $spec->addRestMethods('/sales/', $saleSchema);
 
         $routes = [];
-        foreach ($obj->generateRoutes() as $method => $details) {
+        foreach ($spec->generateRoutes() as $method => $details) {
             [$path, $schemaName, $function] = $details;
             $routes[] = strtoupper($method).' '.$path." -> $schemaName:$function";
         }

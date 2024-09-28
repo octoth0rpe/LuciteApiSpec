@@ -61,20 +61,20 @@ class Specification implements SpecNodeInterface
         $primaryKey = $schema->primaryKey();
 
         if (isset($this->paths[$url]) === false) {
-            $this->addPath(Path::create($url));
+            $this->addPath(new Path($url));
         }
         $this->paths[$url]->addMethod(
-            Method::create('get', 'Fetch a collection of '.$schema->name.' resources', 'get'.$schema->name.'Collection', $schema)
+            (new Method('get', 'Fetch a collection of '.$schema->name.' resources', 'get'.$schema->name.'Collection', $schema))
                 ->addResponse(new Response('200', '', $schema->name, true))
         );
 
         $getOneUrl = $url.'{'.$primaryKey->name.'}';
         if (isset($this->paths[$getOneUrl]) === false) {
-            $this->addPath(Path::create($getOneUrl));
+            $this->addPath(new Path($getOneUrl));
         }
         $this->paths[$getOneUrl]->addMethod(
-            Method::create('get', 'Fetch a single '.$schema->name.' resource', 'get'.$schema->name, $schema)
-                ->addParameter(PathParameter::create($primaryKey->name, 'The '.$primaryKey->name.' of the resource to fetch', true, 'integer'))
+            (new Method('get', 'Fetch a single '.$schema->name.' resource', 'get'.$schema->name, $schema))
+                ->addParameter(new PathParameter($primaryKey->name, 'The '.$primaryKey->name.' of the resource to fetch', true, 'integer'))
                 ->addResponse(new Response('200', '', $schema->name))
                 ->addResponse(new Response('404', 'Not Found'))
         );
@@ -92,11 +92,11 @@ class Specification implements SpecNodeInterface
         }
 
         if (isset($this->paths[$url]) === false) {
-            $this->addPath(Path::create($url));
+            $this->addPath(new Path($url));
         }
 
         $this->paths[$url]->addMethod(
-            Method::create('post', 'Create a new '.$schema->name.' resource', 'create'.$schema->name, $createSchema)
+            (new Method('post', 'Create a new '.$schema->name.' resource', 'create'.$schema->name, $createSchema))
                 ->addResponse(new Response('201', 'Successfully created', $schema->name))
                 ->addResponse(new Response('401', 'Not Authorized'))
                 ->addResponse(new Response('422', 'Validation Error'))
@@ -110,12 +110,12 @@ class Specification implements SpecNodeInterface
         $primaryKey = $schema->primaryKey();
         $url .= '{'.$primaryKey->name.'}';
         if (isset($this->paths[$url]) === false) {
-            $this->addPath(Path::create($url));
+            $this->addPath(new Path($url));
         }
 
         $this->paths[$url]->addMethod(
-            Method::create('patch', 'Update an existing '.$schema->name.' resource', 'update'.$schema->name, $schema)
-                ->addParameter(PathParameter::create($primaryKey->name, 'The '.$primaryKey->name.' of the resource to fetch', true, 'integer'))
+            (new Method('patch', 'Update an existing '.$schema->name.' resource', 'update'.$schema->name, $schema))
+                ->addParameter(new PathParameter($primaryKey->name, 'The '.$primaryKey->name.' of the resource to fetch', true, 'integer'))
                 ->addResponse(new Response('201', 'Successfully updated', $schema->name))
                 ->addResponse(new Response('401', 'Not Authorized'))
                 ->addResponse(new Response('404', 'Not Found'))
@@ -131,11 +131,11 @@ class Specification implements SpecNodeInterface
         $url = $url.'{'.$primaryKey->name.'}';
 
         if (isset($this->paths[$url]) === false) {
-            $this->addPath(Path::create($url));
+            $this->addPath(new Path($url));
         }
         $this->paths[$url]->addMethod(
-            Method::create('delete', 'Delete a '.$schema->name.' resource', 'delete'.$schema->name, $schema)
-                ->addParameter(PathParameter::create($primaryKey->name, 'The '.$primaryKey->name.' of the resource to delete', true, 'integer'))
+            (new Method('delete', 'Delete a '.$schema->name.' resource', 'delete'.$schema->name, $schema))
+                ->addParameter(new PathParameter($primaryKey->name, 'The '.$primaryKey->name.' of the resource to delete', true, 'integer'))
                 ->addResponse(new Response('204', 'Deleted'))
                 ->addResponse(new Response('401', 'Not Authorized'))
                 ->addResponse(new Response('404', 'Not Found'))

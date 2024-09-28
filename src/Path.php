@@ -20,11 +20,6 @@ class Path implements SpecNodeInterface
         return $this;
     }
 
-    public static function create(string $path): Path
-    {
-        return new Path($path);
-    }
-
     public function finalize(): array
     {
         $finalized = [];

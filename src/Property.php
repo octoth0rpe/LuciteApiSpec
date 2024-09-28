@@ -10,13 +10,19 @@ class Property implements SpecNodeInterface
     public string $type;
     public array $rules;
     public bool $required;
+    public bool $readOnly;
+    public bool $writeOnly;
+    public bool $primaryKey;
 
-    public function __construct(string $name, string $type = 'string', ?array $rules = null, ?bool $required = null)
+    public function __construct(string $name, string $type = 'string', array $rules = [], bool $required = false, bool $readOnly = false, bool $writeOnly = false, bool $primaryKey = false)
     {
         $this->name = $name;
         $this->type = $type;
         $this->rules = is_array($rules) ? $rules : [];
-        $this->required = $required === true || (is_array($rules) && count($rules) > 0);
+        $this->required = $required;
+        $this->readOnly = $readOnly || $primaryKey;
+        $this->writeOnly = $writeOnly;
+        $this->primaryKey = $primaryKey;
     }
 
     public function validate(array &$data): bool | string
@@ -28,6 +34,11 @@ class Property implements SpecNodeInterface
         if (is_string($value)) {
             $value = trim($value);
             $data[$this->name] = $value;
+        }
+
+        if ($this->readOnly) {
+            unset($data[$this->name]);
+            return true;
         }
 
         # Apply per type validation

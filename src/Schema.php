@@ -14,11 +14,6 @@ class Schema implements SpecNodeInterface
         $this->name = $name;
     }
 
-    public static function create(string $name): Schema
-    {
-        return new Schema($name);
-    }
-
     public function usesBaseSchema(Schema $baseSchema): bool
     {
         return false;

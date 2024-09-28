@@ -13,10 +13,11 @@ class AddRestDeleteTest extends TestCase
 {
     public function testAddRestDelete(): void
     {
-        $book = Schema::create('Book')
-            ->addProperty(new Property('bookId', 'integer'))
-            ->addProperty(new Property('title'))
-            ->addProperty(new Property('description'));
+        $book = (new Schema('Book'))
+            ->addProperty(new Property(name: 'bookId', type: 'integer', readOnly: true))
+            ->addProperty(new Property(name: 'title', rules: ['minLength' => 1]))
+            ->addProperty(new Property(name: 'description', type: 'string'))
+            ->addProperty(new Property(name: 'createdOn', readOnly: true));
 
         $obj = new Specification('testspec', '1.0.0');
         $obj->addSchema($book);

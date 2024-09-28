@@ -11,7 +11,7 @@ class FinalizePathParameterTest extends TestCase
 {
     public function testFinalizePathParameter(): void
     {
-        $obj = PathParameter::create('testParam', 'parameter passed in querystring', false, 'integer');
+        $obj = new PathParameter('testParam', description: 'parameter passed in querystring', required: false, type: 'integer');
         $finalized = $obj->finalize();
         $keys = array_keys($finalized);
         sort($keys);

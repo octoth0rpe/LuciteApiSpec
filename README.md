@@ -43,11 +43,11 @@ To build something like this,
 
 ```php
 $bookSchema = (new Lucite\ApiSpec\Schema('Book'))
-    ->addProperty(new Property('bookId', 'number'))
-    ->addProperty(new Property('title', 'string', ['minLength' => 1]))
-    ->addProperty(new Property('description', 'string'));
+    ->addProperty(new Property('bookId', type: 'number', primaryKey: true))
+    ->addProperty(new Property('title', rules: ['minLength' => 1]))
+    ->addProperty(new Property('description'));
 
-$spec = new Lucite\ApiSpec\Specification('testspec', '1.2.3');
+$spec = new Lucite\ApiSpec\Specification('testspec', version: '1.2.3');
 $spec->addRestMethods('/books/', $bookSchema);
 ```
 
@@ -133,9 +133,9 @@ Here's an example of how to use a Specification instance to map routes in Lumen 
 
 ```php
 $bookSchema = (new Lucite\ApiSpec\Schema('Book'))
-    ->addProperty(new Lucite\ApiSpec\Property('bookId', 'number'))
-    ->addProperty(new Lucite\ApiSpec\Property('title', 'string', ['minLength' => 1]))
-    ->addProperty(new Lucite\ApiSpec\Property('description', 'string'));
+    ->addProperty(new Lucite\ApiSpec\Property('bookId', type: 'number', primaryKey: true))
+    ->addProperty(new Lucite\ApiSpec\Property('title', rules: ['minLength' => 1]))
+    ->addProperty(new Lucite\ApiSpec\Property('description'));
 
 $spec = new Lucite\ApiSpec\Specification('testspec', '1.2.3');
 $spec->addRestMethods('/books/', $bookSchema);
@@ -179,9 +179,9 @@ Example:
 
 ```php
 $bookSchema = (new Lucite\ApiSpec\Schema('Book'))
-    ->addProperty(new Lucite\ApiSpec\Property('bookId', 'number'))
-    ->addProperty(new Lucite\ApiSpec\Property('title', 'string', ['minLength' => 1]))
-    ->addProperty(new Lucite\ApiSpec\Property('description', 'string'));
+    ->addProperty(new Lucite\ApiSpec\Property('bookId', 'number', primaryKey: true))
+    ->addProperty(new Lucite\ApiSpec\Property('title', rules: ['minLength' => 1]))
+    ->addProperty(new Lucite\ApiSpec\Property('description'));
 
 $data = ['name' => '']);
 $result = $bookSchema->getValidator->validate($data);
@@ -192,9 +192,9 @@ You can get a validator for a schema from the specification object by schema nam
 
 ```php
 $bookSchema = (new Lucite\ApiSpec\Schema('Book'))
-    ->addProperty(new Lucite\ApiSpec\Property('bookId', 'number'))
-    ->addProperty(new Lucite\ApiSpec\Property('title', 'string', ['minLength' => 1]))
-    ->addProperty(new Lucite\ApiSpec\Property('description', 'string'));
+    ->addProperty(new Lucite\ApiSpec\Property('bookId', type: 'number', primaryKey: true))
+    ->addProperty(new Lucite\ApiSpec\Property('title', rules: ['minLength' => 1]))
+    ->addProperty(new Lucite\ApiSpec\Property('description'));
 
 $spec = new Lucite\ApiSpec\Specification('testspec', '1.2.3');
 $spec->addRestMethods('/books/', $bookSchema);

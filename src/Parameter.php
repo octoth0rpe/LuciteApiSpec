@@ -19,6 +19,5 @@ abstract class Parameter implements SpecNodeInterface
         $this->type = $type;
     }
 
-    abstract public static function create(string $name, string $description, bool $required = true, string $type = 'string'): Parameter;
     abstract public function finalize(): array;
 }
