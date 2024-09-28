@@ -23,17 +23,9 @@ class Specification implements SpecNodeInterface
         $this->description = $description;
     }
 
-    public function addSchema(Schema $newSchema, bool $addCreateVariant = true): Specification
+    public function addSchema(Schema $newSchema): Specification
     {
         $this->schemas[$newSchema->name] = $newSchema;
-
-        if ($addCreateVariant) {
-            $createSchema = clone $newSchema;
-            $createSchema->name = $createSchema->name.'Create';
-            array_shift($createSchema->properties);
-            $this->schemas[$createSchema->name] = $createSchema;
-        }
-
         return $this;
     }
 
@@ -84,19 +76,12 @@ class Specification implements SpecNodeInterface
 
     public function addRestPost(string $url, Schema $schema): Specification
     {
-        $createSchema = null;
-        foreach ($this->schemas as $possibleCreateSchema) {
-            if ($possibleCreateSchema->isCreateSchemaFor($schema)) {
-                $createSchema = $possibleCreateSchema;
-            }
-        }
-
         if (isset($this->paths[$url]) === false) {
             $this->addPath(new Path($url));
         }
 
         $this->paths[$url]->addMethod(
-            (new Method('post', 'Create a new '.$schema->name.' resource', 'create'.$schema->name, $createSchema))
+            (new Method('post', 'Create a new '.$schema->name.' resource', 'create'.$schema->name, $schema))
                 ->addResponse(new Response('201', 'Successfully created', $schema->name))
                 ->addResponse(new Response('401', 'Not Authorized'))
                 ->addResponse(new Response('422', 'Validation Error'))
@@ -182,11 +167,8 @@ class Specification implements SpecNodeInterface
                         $function = 'delete';
                         break;
                 }
-                $schemaName = $method->schema->name;
-                if (str_ends_with($schemaName, 'Create')) {
-                    $schemaName = substr($schemaName, 0, strlen($schemaName) - 6);
-                }
-                yield $method->method => [$path->path, $schemaName, $function];
+
+                yield $method->method => [$path->path, $method->schema->name, $function];
             }
         }
     }

@@ -12,8 +12,8 @@ class FinalizeSchemaTest extends TestCase
 {
     public function testConvertSchemaWithoutProperties(): void
     {
-        $obj = new Schema('scheme1');
-        $finalized = $obj->finalize();
+        $schema = new Schema('scheme1');
+        $finalized = $schema->finalize();
         $keys = array_keys($finalized);
         sort($keys);
 
@@ -24,10 +24,10 @@ class FinalizeSchemaTest extends TestCase
 
     public function testConvertSchemaWithProperties(): void
     {
-        $obj = new Schema('scheme1');
-        $obj->addProperty(new Property('id'));
-        $obj->addProperty(new Property('name'));
-        $finalized = $obj->finalize();
+        $schema = new Schema('scheme1');
+        $schema->addProperty(new Property('id'));
+        $schema->addProperty(new Property('name'));
+        $finalized = $schema->finalize();
         $keys = array_keys($finalized);
         sort($keys);
 
@@ -35,5 +35,22 @@ class FinalizeSchemaTest extends TestCase
         $this->assertEquals('properties', $keys[0]);
         $this->assertEquals('type', $keys[1]);
         $this->assertEquals('object', $finalized['type']);
+    }
+
+    public function testRequired(): void
+    {
+        $schema = new Schema('scheme1');
+        $schema->addProperty(new Property('id'));
+        $schema->addProperty(new Property('name', required: true));
+        $finalized = $schema->finalize();
+        $keys = array_keys($finalized);
+        sort($keys);
+        
+        $this->assertEquals(3, count($keys));
+        $this->assertEquals('properties', $keys[0]);
+        $this->assertEquals('required', $keys[1]);
+        $this->assertEquals('type', $keys[2]);
+        $this->assertEquals(1, count($finalized['required']));
+        $this->assertEquals('name', $finalized['required'][0]);
     }
 }

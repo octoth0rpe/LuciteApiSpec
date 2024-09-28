@@ -35,13 +35,13 @@ class FinalizeSpecificationTest extends TestCase
 
     public function testConvertedSpecHasSchemas(): void
     {
-        $obj = new Specification('testspec', '1.0.0');
-        $obj
+        $spec = new Specification('testspec', '1.0.0');
+        $spec
             ->addSchema(new Schema('Book'), false)
             ->addSchema(new Schema('Author'), false)
             ->addSchema(new Schema('Sale'), false);
 
-        $finalized = $obj->finalize();
+        $finalized = $spec->finalize();
 
         $schema_keys = array_keys($finalized['components']['schemas'] ?? []);
         sort($schema_keys);
@@ -54,23 +54,20 @@ class FinalizeSpecificationTest extends TestCase
 
     public function testConvertedSpecHasSchemasWithVariants(): void
     {
-        $obj = new Specification('testspec', '1.0.0');
-        $obj
+        $spec = new Specification('testspec', '1.0.0');
+        $spec
             ->addSchema(new Schema('Book'), true)
             ->addSchema(new Schema('Author'), true)
             ->addSchema(new Schema('Sale'), true);
 
-        $finalized = $obj->finalize();
+        $finalized = $spec->finalize();
 
         $schema_keys = array_keys($finalized['components']['schemas'] ?? []);
         sort($schema_keys);
 
-        $this->assertEquals(6, count($schema_keys));
+        $this->assertEquals(3, count($schema_keys));
         $this->assertEquals('Author', $schema_keys[0]);
-        $this->assertEquals('AuthorCreate', $schema_keys[1]);
-        $this->assertEquals('Book', $schema_keys[2]);
-        $this->assertEquals('BookCreate', $schema_keys[3]);
-        $this->assertEquals('Sale', $schema_keys[4]);
-        $this->assertEquals('SaleCreate', $schema_keys[5]);
+        $this->assertEquals('Book', $schema_keys[1]);
+        $this->assertEquals('Sale', $schema_keys[2]);
     }
 }

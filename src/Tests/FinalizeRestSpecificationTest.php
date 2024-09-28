@@ -14,19 +14,19 @@ class FinalizeRestSpecificationTest extends TestCase
     public function testConvertedSpec(): void
     {
         $bookSchema = (new Schema('Book'))
-            ->addProperty(new Property('bookId', 'number'))
-            ->addProperty(new Property('title', 'string', ['minLength' => 1, 'maxLength' => 255]))
-            ->addProperty(new Property('description', 'string', ['minLength' => 0, 'maxLength' => 8000]));
+            ->addProperty(new Property('bookId', type: 'number', primaryKey: true))
+            ->addProperty(new Property('title', rules: ['minLength' => 1, 'maxLength' => 255]))
+            ->addProperty(new Property('description', rules: ['minLength' => 0, 'maxLength' => 8000]));
         $authorSchema = (new Schema('Author'))
-            ->addProperty(new Property('authorId', 'number'))
-            ->addProperty(new Property('bookId', 'number'))
+            ->addProperty(new Property('authorId', type: 'number', primaryKey: true))
+            ->addProperty(new Property('bookId', type: 'number'))
             ->addProperty(new Property('name'));
         $saleSchema = (new Schema('Sale'))
-            ->addProperty(new Property('saleId', 'number'))
-            ->addProperty(new Property('bookId', 'number'))
-            ->addProperty(new Property('quantity', 'number'));
+            ->addProperty(new Property('saleId', type: 'number'))
+            ->addProperty(new Property('bookId', type: 'number'))
+            ->addProperty(new Property('quantity', type: 'number'));
 
-        $spec = new Specification('testspec', '1.2.3');
+        $spec = new Specification('testspec', version: '1.2.3');
         $spec->addRestMethods('/books/', $bookSchema);
         $spec->addRestMethods('/authors/', $authorSchema);
         $spec->addRestMethods('/sales/', $saleSchema);
@@ -37,9 +37,9 @@ class FinalizeRestSpecificationTest extends TestCase
             $routes[] = strtoupper($method).' '.$path." -> $schemaName:$function";
         }
         sort($routes);
-        #echo("\n--------\n");
-        #echo(json_encode($obj->finalize()));
-        #echo("\n--------\n");
+        echo("\n--------\n");
+        echo(json_encode($spec->finalize()));
+        echo("\n--------\n");
 
 
         $this->assertEquals('DELETE /authors/{authorId} -> Author:delete', $routes[0]);

@@ -19,12 +19,6 @@ class Schema implements SpecNodeInterface
         return false;
     }
 
-    public function isCreateSchemaFor(Schema $baseSchema): bool
-    {
-        # TODO: necessary to compare properties?
-        return $this->name === $baseSchema->name.'Create';
-    }
-
     public function getValidator(): Validator
     {
         if (count($this->properties) === 0) {
@@ -52,6 +46,16 @@ class Schema implements SpecNodeInterface
         $finalized = [
             'type' => 'object',
         ];
+        $required = [];
+        foreach ($this->properties as $prop) {
+            if ($prop->required) {
+                $required[] = $prop->name;
+            }
+        }
+        if (count($required) > 0) {
+            $finalized['required'] = $required;
+        }
+        
         if (count($this->properties) > 0) {
             $finalized['properties'] = [];
             foreach ($this->properties as $property) {
