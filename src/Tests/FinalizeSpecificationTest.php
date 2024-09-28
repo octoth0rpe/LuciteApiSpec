@@ -37,9 +37,9 @@ class FinalizeSpecificationTest extends TestCase
     {
         $spec = new Specification('testspec', '1.0.0');
         $spec
-            ->addSchema(new Schema('Book'), false)
-            ->addSchema(new Schema('Author'), false)
-            ->addSchema(new Schema('Sale'), false);
+            ->addSchema(new Schema('Book'))
+            ->addSchema(new Schema('Author'))
+            ->addSchema(new Schema('Sale'));
 
         $finalized = $spec->finalize();
 
@@ -56,9 +56,9 @@ class FinalizeSpecificationTest extends TestCase
     {
         $spec = new Specification('testspec', '1.0.0');
         $spec
-            ->addSchema(new Schema('Book'), true)
-            ->addSchema(new Schema('Author'), true)
-            ->addSchema(new Schema('Sale'), true);
+            ->addSchema(new Schema('Book'))
+            ->addSchema(new Schema('Author'))
+            ->addSchema(new Schema('Sale'));
 
         $finalized = $spec->finalize();
 
