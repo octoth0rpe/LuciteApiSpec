@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lucite\ApiSpec;
 
+use Lucite\ApiSpec\Schema;
+
 class Property implements SpecNodeInterface
 {
     public string $name;
@@ -13,6 +15,7 @@ class Property implements SpecNodeInterface
     public bool $readOnly;
     public bool $writeOnly;
     public bool $primaryKey;
+    public ?Schema $parent;
 
     public function __construct(string $name, string $type = 'string', array $rules = [], bool $required = false, bool $readOnly = false, bool $writeOnly = false, bool $primaryKey = false)
     {

@@ -16,7 +16,7 @@ class Specification implements SpecNodeInterface
     protected array $paths = [];
     protected array $schemas = [];
 
-    public function __construct(string $title, string $version, ?string $description = null)
+    public function __construct(string $title, string $version = 'v1.0.0', ?string $description = null)
     {
         $this->title = $title;
         $this->version = $version;
@@ -26,6 +26,7 @@ class Specification implements SpecNodeInterface
     public function addSchema(Schema $newSchema): Specification
     {
         $this->schemas[$newSchema->name] = $newSchema;
+        $newSchema->parent = $this;
         return $this;
     }
 
@@ -37,6 +38,7 @@ class Specification implements SpecNodeInterface
     public function addPath(Path $newPath): Specification
     {
         $this->paths[$newPath->path] = $newPath;
+        $newPath->parent = $this;
         return $this;
     }
 

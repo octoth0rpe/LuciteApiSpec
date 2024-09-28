@@ -22,6 +22,6 @@
     },
     "scripts": {
       "format": "pint --preset psr12",
-      "test": "phpunit --stderr --fail-on-warning src/Tests/"
+      "test": "phpunit --stderr --fail-on-warning --fail-on-deprecation src/Tests/"
     }
 }

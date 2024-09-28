@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Lucite\ApiSpec;
 
+use Lucite\ApiSpec\Specification;
+
 class Method implements SpecNodeInterface
 {
     public string $method;
@@ -12,6 +14,7 @@ class Method implements SpecNodeInterface
     public ?Schema $schema;
     public array $responses = [];
     public array $parameters = [];
+    public ?Path $parent;
 
     public function __construct(string $method, string $summary, string $operationId, ?Schema $schema = null)
     {
@@ -61,12 +64,14 @@ class Method implements SpecNodeInterface
     public function addResponse(Response $newResponse): Method
     {
         $this->responses[$newResponse->code] = $newResponse;
+        $newResponse->parent = $this;
         return $this;
     }
 
     public function addParameter(Parameter $newParameter): Method
     {
         $this->parameters[] = $newParameter;
+        $newParameter->parent = $this;
         return $this;
     }
 }

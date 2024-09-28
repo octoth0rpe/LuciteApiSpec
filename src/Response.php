@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Lucite\ApiSpec;
+use Lucite\ApiSpec\Path;
 
 class Response implements SpecNodeInterface
 {
@@ -10,6 +11,7 @@ class Response implements SpecNodeInterface
     public string $description;
     public ?string $schema = null;
     public bool $multiple;
+    public ?Path $parent;
 
     public function __construct(string $code, string $description, ?string $schema = null, bool $multiple = false)
     {

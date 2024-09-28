@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Lucite\ApiSpec;
 
+use Lucite\ApiSpec\Specification;
+
 class Schema implements SpecNodeInterface
 {
     public string $name;
     public array $properties = [];
+    public ?Specification $parent;
 
     public function __construct(string $name)
     {
@@ -30,15 +33,18 @@ class Schema implements SpecNodeInterface
     public function addProperty(Property $newProperty): Schema
     {
         $this->properties[] = $newProperty;
+        $newProperty->parent = $this;
         return $this;
     }
 
     public function primaryKey(): Property
     {
-        if (count($this->properties) === 0) {
-            throw new \Exception('Schema does not have any properties defined');
+        foreach ($this->properties as $prop) {
+            if ($prop->primaryKey) {
+                return $prop;
+            }
         }
-        return $this->properties[0];
+        throw new \Exception('Schema does not have any properties defined');
     }
 
     public function finalize(): array
