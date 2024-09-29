@@ -13,8 +13,8 @@ class Specification implements SpecNodeInterface
     public string $version = '';
     public ?string $description = null;
 
-    protected array $paths = [];
-    protected array $schemas = [];
+    public array $paths = [];
+    public array $schemas = [];
 
     public function __construct(string $title, string $version = 'v1.0.0', ?string $description = null)
     {

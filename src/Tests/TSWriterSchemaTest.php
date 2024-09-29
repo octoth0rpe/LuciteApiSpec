@@ -51,7 +51,7 @@ class TSWriterSchemaTest extends TestCase
         $spec->addSchema(
             (new Schema('Test'))
                 ->addProperty(new Property('testId', type: 'integer'))
-                ->addProperty(new Property('name', type: 'string'))
+                ->addProperty(new Property('name'))
                 ->addProperty(new Property('price', type: 'number'))
                 ->addProperty(new Property('isDeleted', type: 'boolean'))
         );
@@ -61,5 +61,22 @@ class TSWriterSchemaTest extends TestCase
         $this->assertStringContainsString('  name: string;', $schemaOuput);
         $this->assertStringContainsString('  price: number;', $schemaOuput);
         $this->assertStringContainsString('  isDeleted: boolean;', $schemaOuput);
+    }
+
+    public function testConvertAll(): void
+    {
+        $spec = new Specification('test');
+        $spec->addRestMethods(
+            '/test/',
+            (new Schema('Test'))
+                ->addProperty(new Property('testId', type: 'integer', primaryKey: true))
+                ->addProperty(new Property('name'))
+                ->addProperty(new Property('price', type: 'number'))
+                ->addProperty(new Property('isDeleted', type: 'boolean'))
+        );
+
+        $tsWriter = new TypescriptWriter($spec);
+        echo($tsWriter->convert());
+        $this->assertTrue(true);
     }
 }

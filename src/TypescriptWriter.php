@@ -59,4 +59,36 @@ api.{$operation} = () => {
 };
 TYPESCRIPT;
     }
+
+
+    public function convert(): string
+    {
+        $output = "\n";
+        foreach ($this->spec->schemas as $schema) {
+            $output .= $this->convertSchema($schema->name)."\n";
+        }
+        $output .= "\nexport const api = {};\n\n";
+
+        $schemasAdded = [];
+        foreach ($this->spec->paths as $path) {
+            foreach ($path->methods as $method) {
+                $httpMethod = $method->method;
+                $tsSchemaName = $method->schema->name.'Schema';
+                $output .= ('// '.$path->path.' -> '.$httpMethod.' -> '.$tsSchemaName."\n");
+            }
+        }
+        /*
+        foreach ($this->spec->generateRoutes() as $method => $details) {
+            [$path, $schemaName, $action] = $details;
+            $camelCaseName = lcfirst($schemaName);
+            if (isset($schemasAdded[$camelCaseName]) === false) {
+                $output .= "api['{$camelCaseName}'] = {};\n";
+                $schemasAdded[$camelCaseName] = true;
+            }
+            print_r([$method, $details]);
+            # $output .= $this->convertSchema($schema->name)."\n";
+            }*/
+
+        return $output;
+    }
 }

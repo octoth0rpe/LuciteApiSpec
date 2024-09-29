@@ -37,9 +37,9 @@ class FinalizeRestSpecificationTest extends TestCase
             $routes[] = strtoupper($method).' '.$path." -> $schemaName:$function";
         }
         sort($routes);
-        echo("\n--------\n");
-        echo(json_encode($spec->finalize()));
-        echo("\n--------\n");
+        #echo("\n--------\n");
+        #echo(json_encode($spec->finalize()));
+        #echo("\n--------\n");
 
 
         $this->assertEquals('DELETE /authors/{authorId} -> Author:delete', $routes[0]);
