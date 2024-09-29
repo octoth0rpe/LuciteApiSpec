@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lucite\ApiSpec;
 
-use Lucite\Schema\Exception\SchemaNotFoundException;
+use Lucite\ApiSpec\Exception\SchemaNotFoundException;
 
 class Specification implements SpecNodeInterface
 {

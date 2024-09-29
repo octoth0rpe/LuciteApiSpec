@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Lucite\ApiSpec;
 
-use Lucite\ApiSpec\Specification;
-
 class Method implements SpecNodeInterface
 {
     public string $method;

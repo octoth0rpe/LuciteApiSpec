@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Lucite\ApiSpec;
@@ -10,7 +11,7 @@ class TypescriptWriter
     protected string $indent1;
     protected string $indent2;
     protected string $indent3;
-    
+
     public function __construct(Specification $spec)
     {
         $this->spec = $spec;
@@ -26,15 +27,14 @@ class TypescriptWriter
         foreach ($schema->properties as $prop) {
             $properties .= $this->indent1;
             $properties .= $prop->name.': ';
-            switch ($prop->type)
-            {
+            switch ($prop->type) {
                 case 'string':
                 case 'number':
                 case 'boolean':
                 case 'null':
                     $properties .= $prop->type;
                     break;
-                
+
             }
             $properties .= ";\n";
         }
@@ -48,7 +48,7 @@ TYPESCRIPT;
     public function convertRoute(string $method, string $path, string $operation, Schema $schema): string
     {
         $templatedPath = str_replace('{', '${', $path);
-        
+
         return <<<TYPESCRIPT
 api.{$operation} = () => {
     

@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Lucite\ApiSpec;
 
-use Lucite\ApiSpec\Method;
-
 class Path implements SpecNodeInterface
 {
     public string $path;
     public array $methods = [];
-    public ?Method $parent;
+    public ?Specification $parent;
 
     public function __construct(string $path)
     {

@@ -14,7 +14,7 @@ class AddRestGetTest extends TestCase
     public function testAddRestGet(): void
     {
         $book = (new Schema('Book'))
-            ->addProperty(new Property('bookId', type: 'integer'))
+            ->addProperty(new Property('bookId', type: 'integer', primaryKey: true))
             ->addProperty(new Property('title'))
             ->addProperty(new Property('description'));
 

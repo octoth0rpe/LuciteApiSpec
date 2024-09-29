@@ -14,7 +14,7 @@ class AddRestDeleteTest extends TestCase
     public function testAddRestDelete(): void
     {
         $book = (new Schema('Book'))
-            ->addProperty(new Property(name: 'bookId', type: 'integer', readOnly: true))
+            ->addProperty(new Property(name: 'bookId', type: 'integer', primaryKey: true))
             ->addProperty(new Property(name: 'title', rules: ['minLength' => 1]))
             ->addProperty(new Property(name: 'description', type: 'string'))
             ->addProperty(new Property(name: 'createdOn', readOnly: true));

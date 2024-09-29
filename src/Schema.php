@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Lucite\ApiSpec;
 
-use Lucite\ApiSpec\Specification;
+use Lucite\ApiSpec\Exception\NoPropertiesDefinedException;
 
 class Schema implements SpecNodeInterface
 {
@@ -44,7 +44,7 @@ class Schema implements SpecNodeInterface
                 return $prop;
             }
         }
-        throw new \Exception('Schema does not have any properties defined');
+        throw new NoPropertiesDefinedException('Schema does not have any properties defined');
     }
 
     public function finalize(): array
