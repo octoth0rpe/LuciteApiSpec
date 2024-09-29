@@ -58,6 +58,7 @@ class Property implements SpecNodeInterface
             case 'array':
                 return static::validateArray($value, $this->rules);
             case 'number':
+            case 'integer':
                 return static::validateNumber($value, $this->rules);
             case 'object':
                 # TODO: figure out what kind of validation makes sense to implement

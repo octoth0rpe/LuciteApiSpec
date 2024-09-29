@@ -45,7 +45,7 @@ class ValidateNumberTest extends TestCase
 
     public function testConst(): void
     {
-        $property = new Property('prop', 'number', ['const' => 6]);
+        $property = new Property('prop', 'integer', ['const' => 6]);
 
         $data = ['prop' => 1];
         $this->assertTrue(is_string($property->validate($data)));
@@ -70,7 +70,7 @@ class ValidateNumberTest extends TestCase
 
     public function testExclusiveMinimum(): void
     {
-        $property = new Property('prop', 'number', ['exclusiveMinimum' => 6]);
+        $property = new Property('prop', 'integer', ['exclusiveMinimum' => 6]);
 
         $data = ['prop' => 1];
         $this->assertTrue(is_string($property->validate($data)));

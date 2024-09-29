@@ -28,13 +28,17 @@ class TypescriptWriter
             $properties .= $this->indent1;
             $properties .= $prop->name.': ';
             switch ($prop->type) {
+                case 'integer':
+                    $properties .= 'number';
+                    break;
                 case 'string':
                 case 'number':
+                case 'integer':
                 case 'boolean':
                 case 'null':
                     $properties .= $prop->type;
                     break;
-
+                    # TODO: figure out array/object types
             }
             $properties .= ";\n";
         }
